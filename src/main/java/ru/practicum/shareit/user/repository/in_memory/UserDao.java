@@ -52,15 +52,16 @@ public class UserDao implements UserStorage {
         return users.values();
     }
 
-    private void checkEmail(String email) {
-        if (emails.contains(email) || email == null) {
-            throw new EmailConflictException(String.format("Пользователь с %s уже существует", email));
+    @Override
+    public void checkUser(long id) {
+        if (!users.containsKey(id)) {
+            throw new UserNotFoundException(String.format("Пользователь с ID %d не найден", id));
         }
     }
 
-    private void checkUser(long id) {
-        if (!users.containsKey(id)) {
-            throw new UserNotFoundException(String.format("Пользователь с ID %d не найден", id));
+    private void checkEmail(String email) {
+        if (emails.contains(email) || email == null) {
+            throw new EmailConflictException(String.format("Пользователь с %s уже существует", email));
         }
     }
 }

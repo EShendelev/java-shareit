@@ -5,18 +5,22 @@ import ru.practicum.shareit.item.exception.ItemOwnerFailException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemStorage;
 import ru.practicum.shareit.item.repository.in_memory.util.ItemIdProvider;
+import ru.practicum.shareit.user.repository.UserStorage;
 
 import java.util.*;
 
 public class ItemDao implements ItemStorage {
 
+    private UserStorage userStorage;
     private final Map<Long, Item> items = new HashMap<>();
     private final ItemIdProvider idProvider = new ItemIdProvider();
 
     @Override
-    public Item create(Item item) {
+    public Item create(Item item, long ownerId) {
+        userStorage.checkUser(ownerId);
         long id = idProvider.getIncrementId();
         item.setId(id);
+        item.setOwnerId(ownerId);
         items.put(id, item);
         return item;
     }
@@ -84,9 +88,9 @@ public class ItemDao implements ItemStorage {
     }
 
     private void checkItemOwner(Item before, Item after) {
-        if (!(before.getOwner().getId() == after.getOwner().getId())) {
+        if (!(before.getOwnerId() == after.getOwnerId())) {
             throw new ItemOwnerFailException(String.format("Пользователь с ID %d не является владельцем предмета " +
-                    "ID %d", after.getOwner().getId(), before.getId()));
+                    "ID %d", after.getOwnerId(), before.getId()));
         }
     }
 }

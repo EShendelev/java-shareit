@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.Collection;
 
 /**
@@ -14,7 +16,9 @@ import java.util.Collection;
 @RequestMapping("/items")
 public class ItemController {
     @PostMapping
-    public ItemDto create(ItemDto itemDto) {
+    public ItemDto create(@RequestBody @Valid ItemDto itemDto,
+                          @RequestHeader("X-Sharer-User-Id") @Min(1) long ownerId) {
+
         return null;
     }
 
