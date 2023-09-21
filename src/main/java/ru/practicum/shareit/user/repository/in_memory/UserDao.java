@@ -13,7 +13,7 @@ import java.util.*;
 public class UserDao implements UserStorage {
     UserIdProvider idProvider = new UserIdProvider();
     private final Map<Long, User> users = new HashMap<>();
-    private final Set<String> emails = new HashSet<>();
+    private final Map<Long,String> emails = new HashMap<>();
 
     @Override
     public User create(User user) {
@@ -21,6 +21,7 @@ public class UserDao implements UserStorage {
         Long id = idProvider.getIncrementId();
         user.setId(id);
         users.put(id, user);
+        emails.put(id, user.getEmail());
         return user;
     }
 
@@ -32,6 +33,14 @@ public class UserDao implements UserStorage {
         if (!old.getEmail().equals(user.getEmail())) {
             checkEmail(user.getEmail());
         }
+        if (user.getEmail() == null) {
+            user.setEmail(old.getEmail());
+        }
+        if (user.getName() == null) {
+            user.setName(old.getName());
+        }
+        emails.put(id, user.getEmail());
+        users.put(id, user);
         return user;
     }
 
@@ -45,6 +54,7 @@ public class UserDao implements UserStorage {
     public void delete(long id) {
         checkUser(id);
         users.remove(id);
+        emails.remove(id);
     }
 
     @Override
@@ -60,7 +70,7 @@ public class UserDao implements UserStorage {
     }
 
     private void checkEmail(String email) {
-        if (emails.contains(email) || email == null) {
+        if (emails.containsValue(email)) {
             throw new EmailConflictException(String.format("Пользователь с %s уже существует", email));
         }
     }
