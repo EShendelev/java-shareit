@@ -70,7 +70,7 @@ public class ItemDao implements ItemStorage {
         userStorage.checkUser(ownerId);
         Collection<Item> userItems = new ArrayList<>();
         for (Item item : items.values()) {
-            if (item.getOwnerId() == ownerId) {
+            if (Objects.equals(item.getOwnerId(), ownerId)) {
                 userItems.add(item);
             }
         }
@@ -107,7 +107,8 @@ public class ItemDao implements ItemStorage {
     }
 
     private void checkItemOwner(Item before, Item after) {
-        if (!(before.getOwnerId() == after.getOwnerId())) {
+        boolean equals = Objects.equals(before.getOwnerId(), after.getOwnerId());
+        if (!equals) {
             throw new ItemOwnerFailException(String.format("Пользователь с ID %d не является владельцем предмета " +
                     "ID %d", after.getOwnerId(), before.getId()));
         }
