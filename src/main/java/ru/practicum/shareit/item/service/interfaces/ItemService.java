@@ -11,7 +11,8 @@ public interface ItemService {
 
     Item get(long id);
 
-    Collection<Item> getAll();
+    Collection<Item> getAllUserItems(Long ownerId);
+
 
     Collection<Item> getItemByNameOrDescription(String request);
 }

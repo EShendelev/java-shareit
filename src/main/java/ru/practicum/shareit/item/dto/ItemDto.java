@@ -2,8 +2,8 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import ru.practicum.shareit.validation_mark.Create;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -13,13 +13,12 @@ import javax.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 public class ItemDto {
-    @Min(1)
     private long id;
-    @NotBlank
+    @NotBlank(groups = Create.class)
     private String name;
-    @NotBlank
+    @NotBlank(groups = Create.class)
     private String description;
-    @NotNull
-    private boolean available;
+    @NotNull(groups = Create.class)
+    private Boolean available;
 }
 

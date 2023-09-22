@@ -4,21 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.practicum.shareit.request.model.ItemRequest;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-
 /**
  * TODO Sprint add-controllers.
  */
 @Data
 @AllArgsConstructor
 public class Item {
-    @Min(1)
-    @NotNull(message = "ID не может быть пустым")
-    private long id;
+    private Long id;
     private String name;
     private String description;
-    private boolean available;
-    private long ownerId;
+    private Boolean available;
+    private Long ownerId;
     private ItemRequest request;
 }

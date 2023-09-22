@@ -13,7 +13,7 @@ public interface ItemStorage {
 
     Item get(long itemId);
 
-    Collection<Item> getAll();
+    Collection<Item> getAllUserItems(Long ownerId);
 
     Collection<Item> getItemByNameOrDescription(String text);
 }

@@ -1,5 +1,7 @@
 package ru.practicum.shareit.item.repository.in_memory;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.exception.ItemOwnerFailException;
 import ru.practicum.shareit.item.model.Item;
@@ -9,9 +11,11 @@ import ru.practicum.shareit.user.repository.UserStorage;
 
 import java.util.*;
 
+@Repository
+@RequiredArgsConstructor
 public class ItemDao implements ItemStorage {
 
-    private UserStorage userStorage;
+    private final UserStorage userStorage;
     private final Map<Long, Item> items = new HashMap<>();
     private final ItemIdProvider idProvider = new ItemIdProvider();
 
@@ -40,8 +44,11 @@ public class ItemDao implements ItemStorage {
             updatable.setDescription(forUpdate.getDescription());
         }
 
-        if (!Objects.equals(forUpdate.isAvailable(), updatable.isAvailable())) {
-            updatable.setAvailable(forUpdate.isAvailable());
+        if (forUpdate.getAvailable() != null) {
+            if (!Objects.equals(forUpdate.getAvailable(), updatable.getAvailable())) {
+
+                updatable.setAvailable(forUpdate.getAvailable());
+            }
         }
         return updatable;
     }
@@ -59,12 +66,23 @@ public class ItemDao implements ItemStorage {
     }
 
     @Override
-    public Collection<Item> getAll() {
-        return items.values();
+    public Collection<Item> getAllUserItems(Long ownerId) {
+        userStorage.checkUser(ownerId);
+        Collection<Item> userItems = new ArrayList<>();
+        for (Item item : items.values()) {
+            if (item.getOwnerId() == ownerId) {
+                userItems.add(item);
+            }
+        }
+        return userItems;
     }
 
     @Override
     public Collection<Item> getItemByNameOrDescription(String text) {
+        if (text.isBlank()) {
+            return new ArrayList<>();
+        }
+
         String request = text.toLowerCase();
         List<Item> resultList = new ArrayList<>();
 
@@ -74,7 +92,8 @@ public class ItemDao implements ItemStorage {
 
             boolean nameMatch = name.contains(request);
             boolean descriptionMatch = description.contains(request);
-            if (nameMatch || descriptionMatch) {
+            boolean isAvailable = item.getAvailable();
+            if ((nameMatch || descriptionMatch) && isAvailable) {
                 resultList.add(item);
             }
         }

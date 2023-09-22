@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.repository.in_memory;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.user.exception.EmailConflictException;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
@@ -10,6 +11,7 @@ import ru.practicum.shareit.user.repository.in_memory.util.UserIdProvider;
 import java.util.*;
 
 @Repository
+@RequiredArgsConstructor
 public class UserDao implements UserStorage {
     UserIdProvider idProvider = new UserIdProvider();
     private final Map<Long, User> users = new HashMap<>();

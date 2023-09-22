@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service.implement;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemStorage;
@@ -8,8 +9,9 @@ import ru.practicum.shareit.item.service.interfaces.ItemService;
 import java.util.Collection;
 
 @Service
+@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    private ItemStorage itemStorage;
+    private final ItemStorage itemStorage;
 
     @Override
     public Item create(Item item, long ownerId) {
@@ -27,8 +29,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Collection<Item> getAll() {
-        return itemStorage.getAll();
+    public Collection<Item> getAllUserItems(Long ownerId) {
+        return itemStorage.getAllUserItems(ownerId);
     }
 
     @Override
