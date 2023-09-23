@@ -1,23 +1,24 @@
-package ru.practicum.shareit.item.repository.in_memory;
+package ru.practicum.shareit.item.repository.memory;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.exception.ItemOwnerFailException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemStorage;
-import ru.practicum.shareit.item.repository.in_memory.util.ItemIdProvider;
+import ru.practicum.shareit.item.repository.memory.util.ItemIdProvider;
 import ru.practicum.shareit.user.repository.UserStorage;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class ItemDao implements ItemStorage {
 
     private final UserStorage userStorage;
     private final Map<Long, Item> items = new HashMap<>();
-    private final ItemIdProvider idProvider = new ItemIdProvider();
+    private final ItemIdProvider idProvider;
 
     @Override
     public Item create(Item item, long ownerId) {
@@ -68,13 +69,8 @@ public class ItemDao implements ItemStorage {
     @Override
     public Collection<Item> getAllUserItems(Long ownerId) {
         userStorage.checkUser(ownerId);
-        Collection<Item> userItems = new ArrayList<>();
-        for (Item item : items.values()) {
-            if (Objects.equals(item.getOwnerId(), ownerId)) {
-                userItems.add(item);
-            }
-        }
-        return userItems;
+        return items.values().stream().filter(item -> Objects.equals(item.getOwnerId(), ownerId))
+                .collect(Collectors.toList());
     }
 
     @Override

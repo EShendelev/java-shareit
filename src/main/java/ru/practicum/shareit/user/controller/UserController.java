@@ -8,13 +8,13 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.interfaces.UserService;
-import ru.practicum.shareit.validation_mark.Create;
-import ru.practicum.shareit.validation_mark.Update;
+import ru.practicum.shareit.validmark.Create;
+import ru.practicum.shareit.validmark.Update;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * TODO Sprint add-controllers.
@@ -30,12 +30,7 @@ public class UserController {
     @GetMapping
     public Collection<UserDto> getAll() {
         Collection<User> users = userService.getAll();
-        Collection<UserDto> userDtos = new ArrayList<>();
-
-        for (User user : users) {
-            UserDto userDto = UserMapper.toDto(user);
-            userDtos.add(userDto);
-        }
+        Collection<UserDto> userDtos = users.stream().map(UserMapper::toDto).collect(Collectors.toList());
         log.info("Вывод списка всех пользователей");
         return userDtos;
     }

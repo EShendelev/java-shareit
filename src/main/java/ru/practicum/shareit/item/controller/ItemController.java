@@ -8,8 +8,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.interfaces.ItemService;
-import ru.practicum.shareit.validation_mark.Create;
-import ru.practicum.shareit.validation_mark.Update;
+import ru.practicum.shareit.validmark.Create;
+import ru.practicum.shareit.validmark.Update;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -33,7 +33,7 @@ public class ItemController {
                           @Min(1)
                           @NotNull
                           @RequestHeader(REQUEST_HEADER) long ownerId) {
-        Item item = itemService.create(ItemMapper.toModelForCreate(itemDto, ownerId), ownerId);
+        Item item = itemService.create(ItemMapper.toModel(itemDto, ownerId), ownerId);
         log.info("Создана запись о предмете ID {}", item.getId());
         return ItemMapper.toDto(item);
     }

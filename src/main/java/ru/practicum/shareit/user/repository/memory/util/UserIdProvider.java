@@ -1,5 +1,8 @@
-package ru.practicum.shareit.user.repository.in_memory.util;
+package ru.practicum.shareit.user.repository.memory.util;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class UserIdProvider {
     private Long id = 0L;
 

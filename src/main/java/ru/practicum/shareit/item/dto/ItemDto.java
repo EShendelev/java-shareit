@@ -1,8 +1,9 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import ru.practicum.shareit.validation_mark.Create;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import ru.practicum.shareit.validmark.Create;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -10,8 +11,9 @@ import javax.validation.constraints.NotNull;
 /**
  * TODO Sprint add-controllers.
  */
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
+@Builder
 public class ItemDto {
     private long id;
     @NotBlank(groups = Create.class)
