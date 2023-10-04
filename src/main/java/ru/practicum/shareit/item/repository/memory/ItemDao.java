@@ -7,7 +7,6 @@ import ru.practicum.shareit.item.exception.ItemOwnerFailException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemStorage;
 import ru.practicum.shareit.item.repository.memory.util.ItemIdProvider;
-import ru.practicum.shareit.user.repository.UserStorage;
 
 import java.util.*;
 import java.util.stream.Collectors;

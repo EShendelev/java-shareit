@@ -14,7 +14,8 @@ import ru.practicum.shareit.validmark.Update;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * TODO Sprint add-controllers.
@@ -30,7 +31,7 @@ public class UserController {
     @GetMapping
     public Collection<UserDto> getAll() {
         Collection<User> users = userService.getAll();
-        Collection<UserDto> userDtos = users.stream().map(UserMapper::toDto).collect(Collectors.toList());
+        Collection<UserDto> userDtos = users.stream().map(UserMapper::toDto).collect(toList());
         log.info("Вывод списка всех пользователей");
         return userDtos;
     }
@@ -43,8 +44,8 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto create(@Validated({Create.class}) @RequestBody UserDto userDto) {
-        User user = userService.create(UserMapper.toModel(userDto, null));
+    public UserDto save(@Validated({Create.class}) @RequestBody UserDto userDto) {
+        User user = userService.save(UserMapper.toModel(userDto, null));
         log.info("Создан пользовать ID {}", user.getId());
         return UserMapper.toDto(user);
     }

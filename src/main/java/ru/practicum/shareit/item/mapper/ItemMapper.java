@@ -2,13 +2,11 @@ package ru.practicum.shareit.item.mapper;
 
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.repository.UserStorage;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class ItemMapper {
-    private UserStorage userStorage;
 
     public static ItemDto toDto(Item item) {
         return ItemDto.builder()
