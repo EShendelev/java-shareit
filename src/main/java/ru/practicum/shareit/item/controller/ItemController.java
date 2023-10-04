@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoRequest;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.interfaces.ItemService;
@@ -28,32 +28,32 @@ public class ItemController {
     private static final String REQUEST_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public ItemDto create(@Validated({Create.class})
-                          @RequestBody ItemDto itemDto,
-                          @Min(1)
+    public ItemDtoRequest create(@Validated({Create.class})
+                          @RequestBody ItemDtoRequest itemDtoRequest,
+                                 @Min(1)
                           @NotNull
                           @RequestHeader(REQUEST_HEADER) long ownerId) {
-        Item item = itemService.create(ItemMapper.toModel(itemDto, ownerId), ownerId);
+        Item item = itemService.create(ItemMapper.toModel(itemDtoRequest, ownerId), ownerId);
         log.info("Создана запись о предмете ID {}", item.getId());
         return ItemMapper.toDto(item);
     }
 
     @PatchMapping("/{id}")
-    public ItemDto update(@Validated({Update.class})
-                          @RequestBody ItemDto itemDto,
-                          @NotNull
+    public ItemDtoRequest update(@Validated({Update.class})
+                          @RequestBody ItemDtoRequest itemDtoRequest,
+                                 @NotNull
                           @Min(1)
                           @PathVariable("id") long id,
-                          @Min(1)
+                                 @Min(1)
                           @NotNull
                           @RequestHeader(REQUEST_HEADER) long ownerId) {
-        Item item = itemService.update(ItemMapper.toModelForUpdate(itemDto, id, ownerId));
+        Item item = itemService.update(ItemMapper.toModelForUpdate(itemDtoRequest, id, ownerId));
         log.info("Обновлена информация по предмету ID {}", id);
         return ItemMapper.toDto(item);
     }
 
     @GetMapping
-    public Collection<ItemDto> getAllUsersItem(@Min(1)
+    public Collection<ItemDtoRequest> getAllUsersItem(@Min(1)
                                                @NotNull
                                                @RequestHeader(REQUEST_HEADER) Long ownerId) {
         Collection<Item> items = itemService.getAllUserItems(ownerId);
@@ -62,14 +62,14 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ItemDto get(@PathVariable("id") long id) {
+    public ItemDtoRequest get(@PathVariable("id") long id) {
         Item item = itemService.get(id);
         log.info("Получена информация по предмету ID {}", id);
         return ItemMapper.toDto(item);
     }
 
     @GetMapping("/search")
-    public Collection<ItemDto> searchByRequest(@RequestParam String text) {
+    public Collection<ItemDtoRequest> searchByRequest(@RequestParam String text) {
         Collection<Item> items = itemService.getItemByNameOrDescription(text);
         log.info("Получен список предметов подходящих под запрос \"{}\"", text);
         return ItemMapper.toDtoCollection(items);

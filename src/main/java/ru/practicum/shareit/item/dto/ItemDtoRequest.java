@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @Builder
-public class ItemDto {
+public class ItemDtoRequest {
     private long id;
     @NotBlank(groups = Create.class)
     private String name;
