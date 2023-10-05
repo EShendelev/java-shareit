@@ -30,5 +30,5 @@ public class Item {
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
-    private User ownerId;
+    private User owner;
 }

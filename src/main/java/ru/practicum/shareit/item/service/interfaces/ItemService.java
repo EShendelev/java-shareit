@@ -5,14 +5,15 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.Collection;
 
 public interface ItemService {
-    Item create(Item item, long ownerId);
+    Item save(Item item, long userId);
 
-    Item update(Item item);
+    Item update(Long userId, Long itemId, Item item);
 
-    Item get(long id);
+    Item get(Long userId, Long itemId);
 
-    Collection<Item> getAllUserItems(Long ownerId);
+    Collection<Item> getAllById(Long userId);
 
+    Collection<Item> getItemByText(String request);
 
-    Collection<Item> getItemByNameOrDescription(String request);
+    void delete(Long userId, Long itemId);
 }
