@@ -14,6 +14,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.db.UserRepository;
 
 import java.util.Collection;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -43,34 +44,28 @@ public class ItemServiceImpl implements ItemService {
                     "вещи ID %d", userId, itemId));
         }
 
+        if (!item.getName().isBlank()) {
+            updetableItem.setName(item.getName());
+        }
 
-        /**
-         *         long id = forUpdate.getId();
-         *         checkIdItem(id);
-         *         Item updatable = items.get(id);
-         *         checkItemOwner(updatable, forUpdate);
-         *
-         *         if (forUpdate.getName() != null) {
-         *             updatable.setName(forUpdate.getName());
-         *         }
-         *
-         *         if (forUpdate.getDescription() != null) {
-         *             updatable.setDescription(forUpdate.getDescription());
-         *         }
-         *
-         *         if (forUpdate.getAvailable() != null) {
-         *             if (!Objects.equals(forUpdate.getAvailable(), updatable.getAvailable())) {
-         *
-         *                 updatable.setAvailable(forUpdate.getAvailable());
-         *             }
-         *         }
-         *         return updatable;
-         */
-        return itemStorage.update(item);
+        if (!item.getDescription().isBlank()) {
+            updetableItem.setDescription(item.getDescription());
+        }
+
+        if (item.getAvailable() != null) {
+            if (!Objects.equals(item.getAvailable(), updetableItem.getAvailable())) {
+                updetableItem.setAvailable(item.getAvailable());
+            }
+        }
+        log.debug("ItemService: обновлена иформация по предмету ID {} пользователя ID {}", itemId, userId);
+        return updetableItem;
     }
 
     @Override
-    public Item get(Long id) {
+    @Transactional(readOnly = true)
+    public Item get(Long userId, Long itemId) {
+        checkAndReturnUser(userId);
+        Item item = checkAndReturnItem(itemId);
         return itemStorage.get(id);
     }
 

@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
  */
 @Getter
 @Setter
-public class ItemDto {
+public class ItemRequestDto {
     private long id;
     @NotBlank(groups = Create.class)
     private String name;

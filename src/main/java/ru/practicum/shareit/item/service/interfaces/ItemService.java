@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service.interfaces;
 
+import ru.practicum.shareit.item.dto.ItemRequestDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.Collection;
@@ -7,7 +8,7 @@ import java.util.Collection;
 public interface ItemService {
     Item save(Item item, long userId);
 
-    Item update(Long userId, Long itemId, Item item);
+    Item update(Long userId, Long itemId, ItemRequestDto item);
 
     Item get(Long userId, Long itemId);
 

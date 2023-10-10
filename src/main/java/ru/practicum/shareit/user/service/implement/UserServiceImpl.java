@@ -5,11 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.db.UserRepository;
 import ru.practicum.shareit.user.service.interfaces.UserService;
 
 import java.util.Collection;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -20,39 +24,40 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<User> getAll() {
+    public Collection<UserDto> getAll() {
         log.debug("UserService: Выполняется вывод всех пользователей");
-        return userRepository.findAll();
+        return userRepository.findAll().stream().map(UserMapper::toDto).collect(toList());;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public User get(Long id) {
+    public UserDto get(Long id) {
+        UserDto user = UserMapper.toDto(userRepository.getById(id));
         log.debug("UserService: Выполняется вывод пользователя ID {}", id);
-        return userRepository.getById(id);
+        return user;
     }
 
     @Override
     @Transactional
-    public User save(User user) {
+    public UserDto save(UserDto userDto) {
+        User user = UserMapper.toModel(userDto, null);
         log.debug("UserService: Выполняется создание пользователя {}", user.getName());
-        return userRepository.save(user);
+        return UserMapper.toDto(userRepository.save(user));
     }
 
     @Override
     @Transactional
-    public User update(User user) {
-        Long id = user.getId();
+    public UserDto update(Long id, UserDto userDto) {
         User old = checkAndReturnUser(id);
 
-        if (user.getEmail() == null || user.getEmail().isBlank()) {
-            user.setEmail(old.getEmail());
+        if (userDto.getEmail() == null || userDto.getEmail().isBlank()) {
+            userDto.setEmail(old.getEmail());
         }
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(old.getName());
+        if (userDto.getName() == null || userDto.getName().isBlank()) {
+            userDto.setName(old.getName());
         }
         log.debug("UserService: обновлена информация пользователя ID {}", id);
-        return user;
+        return userDto;
     }
 
     @Override
@@ -60,6 +65,7 @@ public class UserServiceImpl implements UserService {
     public void delete(Long id) {
         checkAndReturnUser(id);
         log.debug("UserService: Удаляется пользователь ID {}", id);
+        userRepository.deleteById(id);
     }
 
     private User checkAndReturnUser(Long id) {

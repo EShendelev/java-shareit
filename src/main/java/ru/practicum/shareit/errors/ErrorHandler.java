@@ -4,10 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.exception.ItemNotFoundException;
-import ru.practicum.shareit.exception.ItemOwnerFailException;
-import ru.practicum.shareit.exception.EmailConflictException;
-import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.*;
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -35,7 +32,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public  ErrorResponse handle(ItemOwnerFailException e) {
+    public  ErrorResponse handle(BookingsNotFoundException e) {
         return new ErrorResponse(e.getMessage());
     }
 }

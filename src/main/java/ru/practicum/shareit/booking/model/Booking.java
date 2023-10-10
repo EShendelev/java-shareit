@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
  * TODO Sprint add-bookings.
  */
 @Data
+@Entity
 public class Booking {
     @Id
     @Column(name = "id")
@@ -28,5 +29,5 @@ public class Booking {
     private User booker;
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private BookingStatus status;
+    private Status status;
 }
