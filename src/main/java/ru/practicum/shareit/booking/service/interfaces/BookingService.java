@@ -10,7 +10,7 @@ public interface BookingService {
 
     Collection<BookingResponseDto> getAllByOwnerAndState(Long userId, String stateText);
 
-    BookingResponseDto get(Long userId, Long bookingId);
+    BookingResponseDto findById(Long userId, Long bookingId);
 
     BookingResponseDto save(Long userId, BookingRequestDto bookingRequestDto);
 

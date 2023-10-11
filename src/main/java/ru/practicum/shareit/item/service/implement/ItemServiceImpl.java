@@ -9,7 +9,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.db.CommentRepository;
 import ru.practicum.shareit.item.repository.db.ItemRepository;
 import ru.practicum.shareit.item.service.interfaces.ItemService;
-import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.db.UserRepository;
 
@@ -40,7 +39,7 @@ public class ItemServiceImpl implements ItemService {
         Item updetableItem = checkAndReturnItem(itemId);
 
         if (!updetableItem.getOwner().getId().equals(userId)) {
-            throw new UserNotFoundException(String.format("Пользователь ID %d не является владельцем " +
+            throw new NotFoundException(String.format("Пользователь ID %d не является владельцем " +
                     "вещи ID %d", userId, itemId));
         }
 
@@ -85,7 +84,7 @@ public class ItemServiceImpl implements ItemService {
 
     private User checkAndReturnUser(Long id) {
         return userRepository.findById(id).orElseThrow(
-                () -> new UserNotFoundException(String.format("Пользователь  ID %d не найден", id))
+                () -> new NotFoundException(String.format("Пользователь  ID %d не найден", id))
         );
     }
 

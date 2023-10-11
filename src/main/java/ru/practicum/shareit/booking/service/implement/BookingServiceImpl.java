@@ -8,12 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.interfaces.BookingService;
-import ru.practicum.shareit.exception.BookingsNotFoundException;
-import ru.practicum.shareit.exception.ItemNotFoundException;
-import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidateException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.db.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -118,40 +118,144 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
 
         if (bookings.isEmpty()) {
-            throw new BookingsNotFoundException(String.format("У пользователя ID %d нет бронирований", userId));
+            throw new NotFoundException(String.format("У пользователя ID %d нет бронирований", userId));
         }
-        return null;
+
+        switch (Status.valueOf(stateText)) {
+            case CURRENT:
+                log.debug("BookingService: поиск бронирований по ID владельца и состоянию. ID пользователя {}, " +
+                        "состояние {}", userId, stateText);
+                return bookingRepository.findByBookerIdAndCurrent(
+                                userId,
+                                LocalDateTime.now(),
+                                Sort.by(Sort.Direction.DESC, "start"))
+                        .stream()
+                        .map(BookingMapper::toResponseDto)
+                        .collect(Collectors.toList()
+                        );
+            case PAST:
+                log.debug("BookingService: поиск бронирований по ID владельца и состоянию. ID пользователя {}, " +
+                        "состояние {}", userId, stateText);
+                return bookingRepository.findByBookerIdAndEndIsBefore(
+                                userId,
+                                LocalDateTime.now(),
+                                Sort.by(Sort.Direction.DESC, "start"))
+                        .stream()
+                        .map(BookingMapper::toResponseDto)
+                        .collect(Collectors.toList()
+                        );
+            case FUTURE:
+                log.debug("BookingService: поиск бронирований по ID владельца и состоянию. ID пользователя {}, " +
+                        "состояние {}", userId, stateText);
+                return bookingRepository.findByBookerIdAndStartIsAfter(
+                                userId,
+                                LocalDateTime.now(),
+                                Sort.by(Sort.Direction.DESC, "start"))
+                        .stream()
+                        .map(BookingMapper::toResponseDto)
+                        .collect(Collectors.toList()
+                        );
+            case WAITING:
+                log.debug("BookingService: поиск бронирований по ID владельца и состоянию. ID пользователя {}, " +
+                        "состояние {}", userId, stateText);
+                return bookingRepository.findByBookerIdAndStatus(
+                                userId,
+                                Status.WAITING,
+                                Sort.by(Sort.Direction.DESC, "start"))
+                        .stream()
+                        .map(BookingMapper::toResponseDto)
+                        .collect(Collectors.toList()
+                        );
+            case REJECTED:
+                log.debug("BookingService: поиск бронирований по ID владельца и состоянию. ID пользователя {}, " +
+                        "состояние {}", userId, stateText);
+                return bookingRepository.findByBookerIdAndStatus(
+                                userId,
+                                Status.REJECTED,
+                                Sort.by(Sort.Direction.DESC, "start"))
+                        .stream()
+                        .map(BookingMapper::toResponseDto)
+                        .collect(Collectors.toList()
+                        );
+            default:
+                log.debug("BookingService: поиск бронирований по ID владельца и состоянию. ID пользователя {}, " +
+                        "состояние {}", userId, stateText);
+                return bookings;
+        }
     }
 
     @Override
-    public BookingResponseDto get(Long userId, Long bookingId) {
-        return null;
+    @Transactional(readOnly = true)
+    public BookingResponseDto findById(Long userId, Long bookingId) {
+        Booking booking = checkAndReturnBooking(bookingId);
+
+        if (!booking.getBooker().getId().equals(userId) && !booking.getItem().getOwner().getId().equals(userId)) {
+            throw new NotFoundException(String.format("Пользователь ID {} не является владельцем или " +
+                    "заказчиком бронирования ID {}", userId, bookingId));
+        }
+        log.debug("BookingService: полечение бронирования ID {}", bookingId);
+        return BookingMapper.toResponseDto(booking);
     }
 
     @Override
     public BookingResponseDto save(Long userId, BookingRequestDto bookingRequestDto) {
-        return null;
+        Booking booking = BookingMapper.toModel(bookingRequestDto);
+        booking.setBooker(checkAndReturnUser(userId));
+        Item item = checkAndReturnItem(bookingRequestDto.getItemId());
+
+        if (item.getOwner().getId().equals(userId)) {
+            throw new NotFoundException("Владелец не может забронировать предмет");
+        }
+
+        if (!item.getAvailable()) {
+            throw new ValidateException(String.format("Предмет ID %d не доступен", item.getId()));
+        }
+        booking.setItem(item);
+        Booking resultBooking = bookingRepository.save(booking);
+        return BookingMapper.toResponseDto(resultBooking);
     }
 
     @Override
     public BookingResponseDto updateState(Long userId, Long bookingId, Boolean approved) {
-        return null;
+        Booking booking = checkAndReturnBooking(bookingId);
+
+        if (!userId.equals(booking.getItem().getOwner().getId())) {
+            throw new NotFoundException("Только владелец может изменить статус");
+        }
+        if (booking.getStatus().equals(Status.APPROVED)) {
+            throw new ValidateException("Бронирование уже подтверждено");
+        }
+        if (approved) {
+            booking.setStatus(Status.APPROVED);
+        } else {
+            booking.setStatus(Status.REJECTED);
+        }
+        log.debug("BookingServise: обновление статуса. Пользователь ID {}, бронирование ID {}", userId, bookingId);
+        return BookingMapper.toResponseDto(booking);
     }
 
     @Override
     public void delete(Long bookingId) {
-
+        checkAndReturnBooking(bookingId);
+        log.debug("BookingService: удаление бронирования");
+        bookingRepository.deleteById(bookingId);
     }
 
     private User checkAndReturnUser(Long id) {
         return userRepository.findById(id).orElseThrow(
-                () -> new UserNotFoundException(String.format("Пользователь  ID %d не найден", id))
+                () -> new NotFoundException(String.format("Пользователь  ID %d не найден", id))
         );
     }
 
     private Item checkAndReturnItem(Long id) {
         return itemRepository.findById(id).orElseThrow(
-                () -> new ItemNotFoundException(String.format("Предмет ID %d не найден", id))
+                () -> new NotFoundException(String.format("Предмет ID %d не найден", id))
+        );
+    }
+
+    private Booking checkAndReturnBooking(Long id) {
+        return bookingRepository.findById(id).orElseThrow(
+                () -> new NotFoundException(String.format("Бронирование ID %d не найден", id))
         );
     }
 }

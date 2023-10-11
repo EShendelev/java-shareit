@@ -20,19 +20,13 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handle(UserNotFoundException e) {
+    public ErrorResponse handle(NotFoundException e) {
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handle(ItemNotFoundException e) {
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public  ErrorResponse handle(BookingsNotFoundException e) {
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public  ErrorResponse handle(ValidateException e) {
         return new ErrorResponse(e.getMessage());
     }
 }

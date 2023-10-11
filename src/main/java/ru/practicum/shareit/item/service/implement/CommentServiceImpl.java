@@ -10,7 +10,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.db.CommentRepository;
 import ru.practicum.shareit.item.repository.db.ItemRepository;
 import ru.practicum.shareit.item.service.interfaces.CommentService;
-import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.db.UserRepository;
 
@@ -28,7 +27,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public Comment save(Long userId, Long itemId, Comment comment) {
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new UserNotFoundException(String.format("Пользователь  ID %d не найден", userId))
+                () -> new NotFoundException(String.format("Пользователь  ID %d не найден", userId))
         );
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new ItemNotFoundException(String.format("Предмет ID %d не найден", itemId))

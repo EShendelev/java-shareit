@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
 
     private User checkAndReturnUser(Long id) {
         return userRepository.findById(id).orElseThrow(
-                () -> new UserNotFoundException(String.format("Пользователь ID %d не найден", id))
+                () -> new NotFoundException(String.format("Пользователь ID %d не найден", id))
         );
     }
 }
