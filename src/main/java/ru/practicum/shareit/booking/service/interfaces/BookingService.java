@@ -8,7 +8,7 @@ import java.util.Collection;
 public interface BookingService {
     Collection<BookingResponseDto> getAllByState(Long userId, String stateText);
 
-    Collection<BookingResponseDto> getAllByOwnerAndState(Long userId, String stateText);
+    Collection<BookingResponseDto> getAllByOwnerIdAndState(Long userId, String stateText);
 
     BookingResponseDto findById(Long userId, Long bookingId);
 

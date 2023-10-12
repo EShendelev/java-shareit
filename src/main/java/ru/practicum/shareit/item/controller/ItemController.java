@@ -33,7 +33,7 @@ public class ItemController {
                                  @Min(1)
                           @NotNull
                           @RequestHeader(REQUEST_HEADER) long ownerId) {
-        Item item = itemService.save(ItemMapper.toModel(itemRequestDto, ownerId), ownerId);
+        Item item = itemService.save(ItemMapper.toModel(itemRequestDto), ownerId);
         log.info("Создана запись о предмете ID {}", item.getId());
         return ItemMapper.toDto(item);
     }
@@ -56,21 +56,21 @@ public class ItemController {
     public Collection<ItemRequestDto> getAllUsersItem(@Min(1)
                                                @NotNull
                                                @RequestHeader(REQUEST_HEADER) Long ownerId) {
-        Collection<Item> items = itemService.getAllById(ownerId);
+        Collection<Item> items = itemService.findAllByOwnerId(ownerId);
         log.info("Получен список всех предметов");
         return ItemMapper.toDtoCollection(items);
     }
 
     @GetMapping("/{id}")
     public ItemRequestDto get(@PathVariable("id") long id) {
-        Item item = itemService.get(id);
+        Item item = itemService.findById(id);
         log.info("Получена информация по предмету ID {}", id);
         return ItemMapper.toDto(item);
     }
 
     @GetMapping("/search")
     public Collection<ItemRequestDto> searchByRequest(@RequestParam String text) {
-        Collection<Item> items = itemService.getItemByText(text);
+        Collection<Item> items = itemService.findItemByText(text);
         log.info("Получен список предметов подходящих под запрос \"{}\"", text);
         return ItemMapper.toDtoCollection(items);
     }

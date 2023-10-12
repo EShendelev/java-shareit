@@ -108,7 +108,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<BookingResponseDto> getAllByOwnerAndState(Long userId, String stateText) {
+    public Collection<BookingResponseDto> getAllByOwnerIdAndState(Long userId, String stateText) {
         checkAndReturnUser(userId);
         List<BookingResponseDto> bookings = bookingRepository.findByItemOwnerId(
                         userId,
