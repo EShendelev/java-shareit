@@ -2,15 +2,18 @@ package ru.practicum.shareit.item.service.implement;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.db.CommentRepository;
 import ru.practicum.shareit.item.repository.db.ItemRepository;
@@ -19,8 +22,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.db.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -102,7 +104,52 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     public Collection<ItemResponseDto> findAllByOwnerId(Long ownerId) {
         checkAndReturnUser(ownerId);
-        return itemStorage.getAllUserItems(ownerId);
+        List<Item> items = itemRepository.findAllByOwnerId(ownerId);
+        Map<Item, List<Comment>> itemsWithComments = commentRepository.findAllByItemIn(
+                        items, Sort.by(Sort.Direction.DESC, "created"))
+                .stream()
+                .collect(Collectors.groupingBy(Comment::getItem, Collectors.toList()));
+        Map<Item, List<Booking>> itemsWithBookings = bookingRepository.findAllByItemInAndStatus(
+                        items, Status.APPROVED, Sort.by(Sort.Direction.DESC, "start"))
+                .stream()
+                .collect(Collectors.groupingBy(Booking::getItem, Collectors.toList()));
+
+        List<ItemResponseDto> itemsResponseDtos = items
+                .stream()
+                .map(item -> {
+                    ItemResponseDto itemResponseDto = ItemMapper.toDtoResponse(item);
+                    List<Comment> comments = itemsWithComments.getOrDefault(item, Collections.emptyList());
+                    List<Booking> bookings = itemsWithBookings.getOrDefault(item, Collections.emptyList());
+                    LocalDateTime now = LocalDateTime.now();
+
+                    Booking lastBooking = bookings.stream()
+                            .filter(booking -> ((booking.getEnd().isEqual(now) || booking.getEnd().isBefore(now))
+                                    || (booking.getStart().isEqual(now) || booking.getStart().isBefore(now))))
+                            .findFirst()
+                            .orElse(null);
+
+                    Booking nextBooking = bookings.stream()
+                            .filter(booking -> booking.getStart().isAfter(now))
+                            .reduce((first, second) -> second)
+                            .orElse(null);
+
+                    itemResponseDto.setComments(comments.stream()
+                            .map(CommentMapper::toDto)
+                            .collect(Collectors.toList()));
+
+                    itemResponseDto.setLastBoking(lastBooking == null ? null : new ItemResponseDto.ItemBooking(
+                            lastBooking.getId(),
+                            lastBooking.getBooker().getId()));
+
+                    itemResponseDto.setNextBoking(nextBooking == null ? null : new ItemResponseDto.ItemBooking(
+                            nextBooking.getId(),
+                            nextBooking.getBooker().getId()));
+
+                    return itemResponseDto;
+                })
+                .collect(Collectors.toList());
+        log.debug("ItemService: Поиск всех предметов по владельцу. Пользователь ID {}", ownerId);
+        return itemsResponseDtos;
     }
 
     @Override
