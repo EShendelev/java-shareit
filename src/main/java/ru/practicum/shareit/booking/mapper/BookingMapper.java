@@ -1,12 +1,12 @@
 package ru.practicum.shareit.booking.mapper;
 
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 
-import java.awt.print.Book;
-
+@Component
 public class BookingMapper {
     public static BookingResponseDto toResponseDto(Booking booking) {
         BookingResponseDto bookingResponseDto = new BookingResponseDto();
@@ -30,5 +30,6 @@ public class BookingMapper {
         booking.setStart(bookingRequestDto.getStart());
         booking.setEnd(bookingRequestDto.getEnd());
         booking.setStatus(Status.WAITING);
+        return booking;
     }
 }

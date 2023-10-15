@@ -4,16 +4,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.model.Status;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidateException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.db.CommentRepository;
-import ru.practicum.shareit.item.repository.db.ItemRepository;
+import ru.practicum.shareit.item.repository.CommentRepository;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.interfaces.CommentService;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.db.UserRepository;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +27,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
 
     @Override
     @Transactional
@@ -34,6 +38,16 @@ public class CommentServiceImpl implements CommentService {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new NotFoundException(String.format("Предмет ID %d не найден", itemId))
         );
+
+        boolean bookingApproved = bookingRepository
+                .findByBookerIdAndItemIdAndEndIsBefore(userId, itemId, LocalDateTime.now())
+                .stream()
+                .noneMatch(booking -> booking.getStatus().equals(Status.APPROVED));
+
+        if (bookingApproved) {
+            throw new ValidateException(String.format("Пользователь ID %d не может забронировать предмет ID %d",
+                    userId, itemId));
+        }
 
         Comment comment = CommentMapper.toModel(commentDto);
         comment.setItem(item);

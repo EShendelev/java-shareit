@@ -8,7 +8,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.db.UserRepository;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.interfaces.UserService;
 
 import java.util.Collection;
@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public Collection<UserDto> getAll() {
         log.debug("UserService: Выполняется вывод всех пользователей");
-        return userRepository.findAll().stream().map(UserMapper::toDto).collect(toList());;
+        return userRepository.findAll().stream().map(UserMapper::toDto).collect(toList());
     }
 
     @Override

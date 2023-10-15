@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
-import ru.practicum.shareit.item.mapper.ItemMapper;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.interfaces.CommentService;
 import ru.practicum.shareit.item.service.interfaces.ItemService;
 import ru.practicum.shareit.validmark.Create;
@@ -18,7 +16,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
@@ -36,11 +33,9 @@ public class ItemController {
     @PostMapping
     public ItemResponseDto save(@Validated({Create.class})
                                  @RequestBody ItemRequestDto itemRequestDto,
-                                 @Min(1)
-                                 @NotNull
                                  @RequestHeader(REQUEST_HEADER) Long ownerId) {
         ItemResponseDto itemResponseDto = itemService.save(itemRequestDto, ownerId);
-        log.info("Создана запись о предмете ID {}", item.getId());
+        log.info("Создана запись о предмете ID {}", itemResponseDto.getId());
         return itemResponseDto;
     }
 

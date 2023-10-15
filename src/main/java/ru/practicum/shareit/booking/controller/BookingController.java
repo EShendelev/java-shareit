@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking.controller;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +17,11 @@ import java.util.Collection;
  * TODO Sprint add-bookings.
  */
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
 @Slf4j
 public class BookingController {
+
     private final BookingService bookingService;
 
     @GetMapping
