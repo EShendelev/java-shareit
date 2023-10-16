@@ -32,6 +32,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public UserDto get(Long id) {
+        checkAndReturnUser(id);
         UserDto user = UserMapper.toDto(userRepository.getById(id));
         log.debug("UserService: Выполняется вывод пользователя ID {}", id);
         return user;
@@ -40,23 +41,25 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto save(UserDto userDto) {
-        User user = UserMapper.toModel(userDto, null);
-        log.debug("UserService: Выполняется создание пользователя {}", user.getName());
-        return UserMapper.toDto(userRepository.save(user));
+        User user = userRepository.save(UserMapper.toModel(userDto, null));
+        log.debug("UserService: Выполняется создание пользователя ID {}", user.getId());
+        return UserMapper.toDto(user);
     }
 
     @Override
     @Transactional
     public UserDto update(Long id, UserDto userDto) {
         User old = checkAndReturnUser(id);
-
+        userDto.setId(id);
         if (userDto.getEmail() == null || userDto.getEmail().isBlank()) {
             userDto.setEmail(old.getEmail());
         }
         if (userDto.getName() == null || userDto.getName().isBlank()) {
             userDto.setName(old.getName());
         }
+
         log.debug("UserService: обновлена информация пользователя ID {}", id);
+        userRepository.save(UserMapper.toModel(userDto, id));
         return userDto;
     }
 

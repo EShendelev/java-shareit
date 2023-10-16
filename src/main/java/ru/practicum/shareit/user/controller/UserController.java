@@ -9,7 +9,6 @@ import ru.practicum.shareit.user.service.interfaces.UserService;
 import ru.practicum.shareit.validmark.Create;
 import ru.practicum.shareit.validmark.Update;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
 
@@ -45,14 +44,13 @@ public class UserController {
         return user;
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{userId}")
     public UserDto update(@NotNull(message = "поле ID не может быть пустым")
-                          @Min(1)
-                          @PathVariable("id") long id,
+                          @PathVariable Long userId,
                           @Validated({Update.class})
                           @RequestBody UserDto userDto) {
-        UserDto user = userService.update(id, userDto);
-        log.info("Обновлена информация пользователя ID {}", id);
+        UserDto user = userService.update(userId, userDto);
+        log.info("Обновлена информация пользователя ID {}", userId);
         return user;
     }
 
