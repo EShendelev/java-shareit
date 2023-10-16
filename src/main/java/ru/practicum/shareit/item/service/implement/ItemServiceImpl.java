@@ -56,11 +56,11 @@ public class ItemServiceImpl implements ItemService {
                     "вещи ID %d", userId, itemId));
         }
 
-        if (!itemRequestDto.getName().isBlank()) {
+        if (itemRequestDto.getName() != null && !itemRequestDto.getName().isBlank()) {
             updetableItem.setName(itemRequestDto.getName());
         }
 
-        if (!itemRequestDto.getDescription().isBlank()) {
+        if (itemRequestDto.getDescription() != null && !itemRequestDto.getDescription().isBlank()) {
             updetableItem.setDescription(itemRequestDto.getDescription());
         }
 
@@ -69,6 +69,7 @@ public class ItemServiceImpl implements ItemService {
                 updetableItem.setAvailable(itemRequestDto.getAvailable());
             }
         }
+        itemRepository.save(updetableItem);
         log.debug("ItemService: обновлена иформация по предмету ID {} пользователя ID {}", itemId, userId);
         return ItemMapper.toDtoResponse(updetableItem);
     }
@@ -80,11 +81,14 @@ public class ItemServiceImpl implements ItemService {
         Item item = checkAndReturnItem(itemId);
 
         ItemResponseDto itemResponseDto = ItemMapper.toDtoResponse(item);
-        itemResponseDto.setComments(commentRepository.findAllByItem(itemId)
+        List<Comment> comments = commentRepository.findAllByItemId(itemId);
+
+        itemResponseDto.setComments(comments
                 .stream()
                 .map(CommentMapper::toDto)
                 .collect(Collectors.toList())
         );
+
 
         Booking lastBooking = bookingRepository.findLastBooking(LocalDateTime.now(), userId, itemId);
         Booking nextBooking = bookingRepository.findNextBooking(LocalDateTime.now(), userId, itemId);

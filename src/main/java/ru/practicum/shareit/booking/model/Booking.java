@@ -28,11 +28,11 @@ public class Booking {
     private LocalDateTime start;
     @Column(name = "end_date", nullable = false)
     private LocalDateTime end;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booker_id")
     private User booker;
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
