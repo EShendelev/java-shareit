@@ -8,6 +8,7 @@ import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.service.interfaces.BookingService;
+import ru.practicum.shareit.exception.StatusNotExistException;
 import ru.practicum.shareit.exception.ValidateException;
 import ru.practicum.shareit.validmark.Create;
 
@@ -29,7 +30,7 @@ public class BookingController {
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(name = "state", defaultValue = "ALL") String stateText) {
         if (!Status.checkValidStatus(stateText)) {
-            throw new IllegalArgumentException("Неизвестный статус: " + stateText);
+            throw new StatusNotExistException("Unknown state: " + stateText);
         }
         log.info("BookingController. GET /bookings. User ID {}, {}", userId, stateText);
         return bookingService.getAllByState(userId, stateText);
@@ -40,7 +41,7 @@ public class BookingController {
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(name = "state", defaultValue = "ALL") String stateText) {
         if (!Status.checkValidStatus(stateText)) {
-            throw new IllegalArgumentException("Неизвестный статус: " + stateText);
+            throw new StatusNotExistException("Unknown state: " + stateText);
         }
         log.info("BookingController. GET /owner. User ID {}, {}", userId, stateText);
         return bookingService.getAllByOwnerIdAndState(userId, stateText);

@@ -109,6 +109,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public Collection<BookingResponseDto> getAllByOwnerIdAndState(Long userId, String stateText) {
+
         checkAndReturnUser(userId);
         List<BookingResponseDto> bookings = bookingRepository.findByItemOwnerId(
                         userId,
@@ -125,7 +126,7 @@ public class BookingServiceImpl implements BookingService {
             case CURRENT:
                 log.debug("BookingService: поиск бронирований по ID владельца и состоянию. ID пользователя {}, " +
                         "состояние {}", userId, stateText);
-                return bookingRepository.findByBookerIdAndCurrent(
+                return bookingRepository.findByItemOwnerIdAndCurrent(
                                 userId,
                                 LocalDateTime.now(),
                                 Sort.by(Sort.Direction.DESC, "start"))
@@ -136,7 +137,7 @@ public class BookingServiceImpl implements BookingService {
             case PAST:
                 log.debug("BookingService: поиск бронирований по ID владельца и состоянию. ID пользователя {}, " +
                         "состояние {}", userId, stateText);
-                return bookingRepository.findByBookerIdAndEndIsBefore(
+                return bookingRepository.findByItemOwnerIdAndEndIsBefore(
                                 userId,
                                 LocalDateTime.now(),
                                 Sort.by(Sort.Direction.DESC, "start"))
@@ -147,7 +148,7 @@ public class BookingServiceImpl implements BookingService {
             case FUTURE:
                 log.debug("BookingService: поиск бронирований по ID владельца и состоянию. ID пользователя {}, " +
                         "состояние {}", userId, stateText);
-                return bookingRepository.findByBookerIdAndStartIsAfter(
+                return bookingRepository.findByItemOwnerIdAndStartIsAfter(
                                 userId,
                                 LocalDateTime.now(),
                                 Sort.by(Sort.Direction.DESC, "start"))
@@ -158,7 +159,7 @@ public class BookingServiceImpl implements BookingService {
             case WAITING:
                 log.debug("BookingService: поиск бронирований по ID владельца и состоянию. ID пользователя {}, " +
                         "состояние {}", userId, stateText);
-                return bookingRepository.findByBookerIdAndStatus(
+                return bookingRepository.findByItemOwnerIdAndStatus(
                                 userId,
                                 Status.WAITING,
                                 Sort.by(Sort.Direction.DESC, "start"))
@@ -169,7 +170,7 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED:
                 log.debug("BookingService: поиск бронирований по ID владельца и состоянию. ID пользователя {}, " +
                         "состояние {}", userId, stateText);
-                return bookingRepository.findByBookerIdAndStatus(
+                return bookingRepository.findByItemOwnerIdAndStatus(
                                 userId,
                                 Status.REJECTED,
                                 Sort.by(Sort.Direction.DESC, "start"))
@@ -198,6 +199,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingResponseDto save(Long userId, BookingRequestDto bookingRequestDto) {
         Booking booking = BookingMapper.toModel(bookingRequestDto);
         booking.setBooker(checkAndReturnUser(userId));
@@ -216,6 +218,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingResponseDto updateState(Long userId, Long bookingId, Boolean approved) {
         Booking booking = checkAndReturnBooking(bookingId);
 
@@ -230,11 +233,13 @@ public class BookingServiceImpl implements BookingService {
         } else {
             booking.setStatus(Status.REJECTED);
         }
+        bookingRepository.save(booking);
         log.debug("BookingServise: обновление статуса. Пользователь ID {}, бронирование ID {}", userId, bookingId);
         return BookingMapper.toResponseDto(booking);
     }
 
     @Override
+    @Transactional
     public void delete(Long bookingId) {
         checkAndReturnBooking(bookingId);
         log.debug("BookingService: удаление бронирования");

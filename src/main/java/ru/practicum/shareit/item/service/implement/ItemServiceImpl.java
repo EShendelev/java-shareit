@@ -42,7 +42,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = ItemMapper.toModel(itemRequestDto);
         item.setOwner(user);
         Item saveItem = itemRepository.save(item);
-        log.debug("ItemService: сохранение предмета ID {} пользователя ID {}", item.getId(), ownerId);
+        log.info("ItemService: сохранение предмета ID {} пользователя ID {}", item.getId(), ownerId);
         return ItemMapper.toDtoResponse(saveItem);
     }
 
@@ -70,7 +70,7 @@ public class ItemServiceImpl implements ItemService {
             }
         }
         itemRepository.save(updetableItem);
-        log.debug("ItemService: обновлена иформация по предмету ID {} пользователя ID {}", itemId, userId);
+        log.info("ItemService: обновлена иформация по предмету ID {} пользователя ID {}", itemId, userId);
         return ItemMapper.toDtoResponse(updetableItem);
     }
 
@@ -78,7 +78,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     public ItemResponseDto findById(Long userId, Long itemId) {
         checkAndReturnUser(userId);
-        Item item = checkAndReturnItem(itemId);
+         Item item = checkAndReturnItem(itemId);
 
         ItemResponseDto itemResponseDto = ItemMapper.toDtoResponse(item);
         List<Comment> comments = commentRepository.findAllByItemId(itemId);
@@ -100,7 +100,7 @@ public class ItemServiceImpl implements ItemService {
                 nextBooking.getId(),
                 nextBooking.getBooker().getId()));
 
-        log.debug("ItemService: поиск предмета по ID. Пользователь ID {}, предмет ID {}", userId, itemId);
+        log.info("ItemService: поиск предмета по ID. Пользователь ID {}, предмет ID {}", userId, itemId);
         return itemResponseDto;
     }
 
@@ -152,14 +152,18 @@ public class ItemServiceImpl implements ItemService {
                     return itemResponseDto;
                 })
                 .collect(Collectors.toList());
-        log.debug("ItemService: Поиск всех предметов по владельцу. Пользователь ID {}", ownerId);
+        log.info("ItemService: Поиск всех предметов по владельцу. Пользователь ID {}", ownerId);
         return itemsResponseDtos;
     }
 
     @Override
     @Transactional(readOnly = true)
     public Collection<ItemResponseDto> findItemByText(String text) {
-        log.debug("ItemService: поиск по совпадениям. Запрос: {}", text);
+        if (text.isEmpty()) {
+            log.info("Пустой поисковый запрос");
+            return new ArrayList<>();
+        }
+        log.info("ItemService: поиск по совпадениям. Запрос: {}", text);
         return itemRepository.search(text)
                 .stream()
                 .map(ItemMapper::toDtoResponse)
@@ -170,6 +174,7 @@ public class ItemServiceImpl implements ItemService {
     public void delete(Long userId, Long itemId) {
         checkAndReturnItem(itemId);
         checkAndReturnUser(userId);
+        itemRepository.deleteById(itemId);
         log.debug("ItemService: delete");
     }
 
