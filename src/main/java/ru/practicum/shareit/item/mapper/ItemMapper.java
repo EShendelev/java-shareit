@@ -19,8 +19,8 @@ public class ItemMapper {
         itemResponseDto.setDescription(item.getDescription());
         itemResponseDto.setAvailable(item.getAvailable());
         itemResponseDto.setOwner(new ItemResponseDto.ItemOwner(ownerId, ownerName));
-        itemResponseDto.setLastBoking(null);
-        itemResponseDto.setNextBoking(null);
+        itemResponseDto.setLastBooking(null);
+        itemResponseDto.setNextBooking(null);
         itemResponseDto.setComments(new ArrayList<>());
         return itemResponseDto;
     }

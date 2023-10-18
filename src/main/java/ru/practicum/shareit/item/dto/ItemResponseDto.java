@@ -14,8 +14,8 @@ public class ItemResponseDto {
     private String description;
     private Boolean available;
     private ItemOwner owner;
-    private ItemBooking lastBoking;
-    private ItemBooking nextBoking;
+    private ItemBooking lastBooking;
+    private ItemBooking nextBooking;
     private List<CommentDto> comments;
 
     @Data

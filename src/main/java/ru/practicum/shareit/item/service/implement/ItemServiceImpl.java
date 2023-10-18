@@ -90,13 +90,17 @@ public class ItemServiceImpl implements ItemService {
         );
 
 
-        Booking lastBooking = bookingRepository.findLastBooking(LocalDateTime.now(), userId, itemId);
-        Booking nextBooking = bookingRepository.findNextBooking(LocalDateTime.now(), userId, itemId);
+        List<Booking> lastBookings = bookingRepository.findLastBooking(LocalDateTime.now(), userId, itemId);
+        List<Booking> nextBookings = bookingRepository.findNextBooking(LocalDateTime.now(), userId, itemId);
+        Booking lastBooking = bookingRepository.findLastBooking(LocalDateTime.now(), userId, itemId)
+                .stream().findFirst().orElse(null);
+        Booking nextBooking = bookingRepository.findNextBooking(LocalDateTime.now(), userId, itemId)
+                .stream().findFirst().orElse(null);
 
-        itemResponseDto.setLastBoking(lastBooking == null ? null : new ItemResponseDto.ItemBooking(
+        itemResponseDto.setLastBooking(lastBooking == null ? null : new ItemResponseDto.ItemBooking(
                 lastBooking.getId(),
                 lastBooking.getBooker().getId()));
-        itemResponseDto.setNextBoking(nextBooking == null ? null : new ItemResponseDto.ItemBooking(
+        itemResponseDto.setNextBooking(nextBooking == null ? null : new ItemResponseDto.ItemBooking(
                 nextBooking.getId(),
                 nextBooking.getBooker().getId()));
 
@@ -141,11 +145,11 @@ public class ItemServiceImpl implements ItemService {
                             .map(CommentMapper::toDto)
                             .collect(Collectors.toList()));
 
-                    itemResponseDto.setLastBoking(lastBooking == null ? null : new ItemResponseDto.ItemBooking(
+                    itemResponseDto.setLastBooking(lastBooking == null ? null : new ItemResponseDto.ItemBooking(
                             lastBooking.getId(),
                             lastBooking.getBooker().getId()));
 
-                    itemResponseDto.setNextBoking(nextBooking == null ? null : new ItemResponseDto.ItemBooking(
+                    itemResponseDto.setNextBooking(nextBooking == null ? null : new ItemResponseDto.ItemBooking(
                             nextBooking.getId(),
                             nextBooking.getBooker().getId()));
 

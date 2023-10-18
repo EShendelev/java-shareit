@@ -33,8 +33,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "LEFT JOIN Item AS i ON b.item.id = i.id " +
             "LEFT JOIN User AS us ON i.owner.id = us.id " +
             "WHERE us.id = :userId " +
-            "AND :time BETWEEN b.start AND b.end ")
+            "AND :time > b.start AND :time < b.end ")
     List<Booking> findByItemOwnerIdAndCurrent(Long userId, LocalDateTime time, Sort sort);
+
 
     List<Booking> findByItemOwnerIdAndEndIsBefore(Long userId, LocalDateTime time, Sort sort);
 
@@ -45,14 +46,19 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByBookerIdAndItemIdAndEndIsBefore(Long id, Long itemId, LocalDateTime time);
 
     @Query("SELECT b FROM  Booking b " +
-            "WHERE b.item.id = :itemId AND b.item.owner.id = :userId AND b.status = 'APPROVED' AND b.end < :now " +
+            "WHERE b.item.id = :itemId AND b.item.owner.id = :ownerId AND b.status = 'APPROVED' " +
+            "AND (b.end < :now OR :now BETWEEN b.start AND b.end) " +
             "ORDER BY b.start DESC")
-    Booking findLastBooking(LocalDateTime now, Long userId, Long itemId);
+    List<Booking> findLastBooking(LocalDateTime now, Long ownerId, Long itemId);
+
+//    Booking findBookingByItemOwnerIdAndItem_IdAndStartIsAfter(Long ownerId, Long itemId, LocalDateTime now);
+//
+//    Booking findBookingByItemOwnerIdAndItem_IdAndEndIsBefore(Long ownerId, Long itemId, LocalDateTime now);
 
     @Query("SELECT b FROM  Booking b " +
-            "WHERE b.item.id = :itemId AND b.item.owner.id = :userId AND b.status = 'APPROVED' AND b.start > :now " +
+            "WHERE b.item.id = :itemId AND b.item.owner.id = :ownerId AND b.status = 'APPROVED' AND b.start > :now " +
             "ORDER BY b.start")
-    Booking findNextBooking(LocalDateTime now, Long userId, Long itemId);
+    List<Booking> findNextBooking(LocalDateTime now, Long ownerId, Long itemId);
 
     List<Booking> findAllByItemInAndStatus(List<Item> items, Status status, Sort sort);
 }
