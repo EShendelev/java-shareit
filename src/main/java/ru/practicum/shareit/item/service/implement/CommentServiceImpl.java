@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidateException;
@@ -39,13 +38,13 @@ public class CommentServiceImpl implements CommentService {
                 () -> new NotFoundException(String.format("Предмет ID %d не найден", itemId))
         );
 
-        boolean bookingApproved = bookingRepository
-                .findByBookerIdAndItemIdAndEndIsBefore(userId, itemId, LocalDateTime.now())
-                .stream()
-                .noneMatch(booking -> booking.getStatus().equals(Status.APPROVED));
+        int countApproveBookings = bookingRepository.countApprovedBookingsByUserIdAndItemId(userId, itemId,
+                LocalDateTime.now());
 
+        boolean bookingApproved = countApproveBookings == 0;
         if (bookingApproved) {
-            throw new ValidateException(String.format("Предмет ID %d уже забронирован", itemId));
+            throw new ValidateException(String.format("Бронирование предмета ID %d еще не подтверждено влдадельцем " +
+                    "ID %d", itemId, userId));
         }
 
         Comment comment = CommentMapper.toModel(commentDto);

@@ -21,7 +21,6 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +35,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public Collection<BookingResponseDto> getAllByState(Long userId, String stateText) {
-        checkAndReturnUser(userId);
+        checkUser(userId);
 
         switch (Status.valueOf(stateText)) {
             case CURRENT:
@@ -109,16 +108,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public Collection<BookingResponseDto> getAllByOwnerIdAndState(Long userId, String stateText) {
-
         checkUser(userId);
-        List<BookingResponseDto> bookings = bookingRepository.findByItemOwnerId(
-                        userId,
-                        Sort.by(Sort.Direction.DESC, "start"))
-                .stream()
-                .map(BookingMapper::toResponseDto)
-                .collect(Collectors.toList());
 
-        if (bookings.isEmpty()) {
+        int countOfBookings = bookingRepository.findBookinsCountByOwnerId(userId);
+
+        if (countOfBookings == 0) {
             throw new NotFoundException(String.format("У пользователя ID %d нет бронирований", userId));
         }
 
@@ -181,7 +175,12 @@ public class BookingServiceImpl implements BookingService {
             default:
                 log.debug("BookingService: поиск бронирований по ID владельца и состоянию. ID пользователя {}, " +
                         "состояние {}", userId, stateText);
-                return bookings;
+                return bookingRepository.findByItemOwnerId(
+                                userId,
+                                Sort.by(Sort.Direction.DESC, "start"))
+                        .stream()
+                        .map(BookingMapper::toResponseDto)
+                        .collect(Collectors.toList());
         }
     }
 

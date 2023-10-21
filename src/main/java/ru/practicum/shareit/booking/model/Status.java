@@ -15,7 +15,7 @@ public enum Status {
     public static void checkValidStatus(String stateParam) {
         try {
             Status.valueOf(stateParam);
-        } catch (IllegalArgumentException | NullPointerException e) {
+        } catch (IllegalArgumentException e) {
             throw new StatusNotExistException("Unknown state: " + stateParam);
         }
     }

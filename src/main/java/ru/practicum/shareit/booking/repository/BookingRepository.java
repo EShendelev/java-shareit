@@ -46,6 +46,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByBookerIdAndItemIdAndEndIsBefore(Long id, Long itemId, LocalDateTime time);
 
+    @Query(value = "SELECT COUNT(*) FROM bookings " +
+            "WHERE booker_id = ?1 AND item_id = ?2 AND end_date < ?3 AND status = 'APPROVED'",
+            nativeQuery = true)
+    int countApprovedBookingsByUserIdAndItemId(Long userId, Long itemId, LocalDateTime time);
+
     @Query(value = "SELECT * FROM bookings b " +
             "JOIN public.items i on i.id = b.item_id " +
             "WHERE i.id = ?3 AND i.owner_id = ?2 AND b.status = 'APPROVED' " +
@@ -72,4 +77,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "WHERE b.id = ?1",
             nativeQuery = true)
     Optional<Long> checkIdValue(Long itemId);
+
+    @Query(value = "SELECT count(*) FROM bookings",
+    nativeQuery = true)
+    int findBookinsCountByOwnerId(Long ownerId);
 }
