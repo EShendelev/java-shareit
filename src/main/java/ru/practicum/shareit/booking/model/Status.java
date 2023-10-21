@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking.model;
 
+import ru.practicum.shareit.exception.StatusNotExistException;
+
 public enum Status {
     ALL,
     CURRENT,
@@ -10,13 +12,11 @@ public enum Status {
     APPROVED,
     CANCELED;
 
-    public static Boolean checkValidStatus(String stateParam) {
-        for (Status value : Status.values()) {
-            boolean check = value.name().equals(stateParam);
-            if (check) {
-                return true;
-            }
+    public static void checkValidStatus(String stateParam) {
+        try {
+            Status.valueOf(stateParam);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new StatusNotExistException("Unknown state: " + stateParam);
         }
-        return false;
     }
 }

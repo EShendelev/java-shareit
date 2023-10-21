@@ -110,7 +110,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     public Collection<BookingResponseDto> getAllByOwnerIdAndState(Long userId, String stateText) {
 
-        checkAndReturnUser(userId);
+        checkUser(userId);
         List<BookingResponseDto> bookings = bookingRepository.findByItemOwnerId(
                         userId,
                         Sort.by(Sort.Direction.DESC, "start"))
@@ -241,7 +241,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public void delete(Long bookingId) {
-        checkAndReturnBooking(bookingId);
+        checkBooking(bookingId);
         log.debug("BookingService: удаление бронирования");
         bookingRepository.deleteById(bookingId);
     }
@@ -249,6 +249,24 @@ public class BookingServiceImpl implements BookingService {
     private User checkAndReturnUser(Long id) {
         return userRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь  ID %d не найден", id))
+        );
+    }
+
+    private void checkItem(Long id) {
+        itemRepository.checkIdValue(id).orElseThrow(
+                () -> new NotFoundException(String.format("Предмет ID %d не найден", id))
+        );
+    }
+
+    private void checkUser(Long id) {
+        userRepository.checkIdValue(id).orElseThrow(
+                () -> new NotFoundException(String.format("Пользователь ID %d не найден", id))
+        );
+    }
+
+    private void checkBooking(Long id) {
+        bookingRepository.checkIdValue(id).orElseThrow(
+                () -> new NotFoundException(String.format("Бронирование ID %d не найдено", id))
         );
     }
 
@@ -260,7 +278,7 @@ public class BookingServiceImpl implements BookingService {
 
     private Booking checkAndReturnBooking(Long id) {
         return bookingRepository.findById(id).orElseThrow(
-                () -> new NotFoundException(String.format("Бронирование ID %d не найден", id))
+                () -> new NotFoundException(String.format("Бронирование ID %d не найдено", id))
         );
     }
 }

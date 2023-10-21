@@ -10,6 +10,7 @@ import ru.practicum.shareit.item.model.Item;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -45,20 +46,30 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByBookerIdAndItemIdAndEndIsBefore(Long id, Long itemId, LocalDateTime time);
 
-    @Query("SELECT b FROM  Booking b " +
-            "WHERE b.item.id = :itemId AND b.item.owner.id = :ownerId AND b.status = 'APPROVED' " +
-            "AND (b.end < :now OR :now BETWEEN b.start AND b.end) " +
-            "ORDER BY b.start DESC")
-    List<Booking> findLastBooking(LocalDateTime now, Long ownerId, Long itemId);
+    @Query(value = "SELECT * FROM bookings b " +
+            "JOIN public.items i on i.id = b.item_id " +
+            "WHERE i.id = ?3 AND i.owner_id = ?2 AND b.status = 'APPROVED' " +
+            "AND (b.end_date < ?1 OR ?1 BETWEEN b.start_date AND b.end_date) " +
+            "ORDER BY b.start_date DESC " +
+            "LIMIT 1",
+            nativeQuery = true)
+    Booking findLastBooking(LocalDateTime now, Long ownerId, Long itemId);
 
-//    Booking findBookingByItemOwnerIdAndItem_IdAndStartIsAfter(Long ownerId, Long itemId, LocalDateTime now);
-//
-//    Booking findBookingByItemOwnerIdAndItem_IdAndEndIsBefore(Long ownerId, Long itemId, LocalDateTime now);
-
-    @Query("SELECT b FROM  Booking b " +
-            "WHERE b.item.id = :itemId AND b.item.owner.id = :ownerId AND b.status = 'APPROVED' AND b.start > :now " +
-            "ORDER BY b.start")
-    List<Booking> findNextBooking(LocalDateTime now, Long ownerId, Long itemId);
+    @Query(value = "SELECT * FROM bookings b " +
+            "JOIN public.items i on i.id = b.item_id " +
+            "WHERE i.id = ?3 AND i.owner_id = ?2 AND b.status = 'APPROVED' " +
+            "AND b.start_date > ?1 " +
+            "ORDER BY b.start_date " +
+            "LIMIT 1",
+            nativeQuery = true)
+    Booking findNextBooking(LocalDateTime now, Long ownerId, Long itemId);
 
     List<Booking> findAllByItemInAndStatus(List<Item> items, Status status, Sort sort);
+
+    List<Booking> findAllByItemIdInAndStatus(List<Long> itemIds, Status status, Sort sort);
+
+    @Query(value = "SELECT b.id FROM bookings b " +
+            "WHERE b.id = ?1",
+            nativeQuery = true)
+    Optional<Long> checkIdValue(Long itemId);
 }

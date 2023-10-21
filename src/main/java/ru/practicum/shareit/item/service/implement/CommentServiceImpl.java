@@ -45,8 +45,7 @@ public class CommentServiceImpl implements CommentService {
                 .noneMatch(booking -> booking.getStatus().equals(Status.APPROVED));
 
         if (bookingApproved) {
-            throw new ValidateException(String.format("Пользователь ID %d не может забронировать предмет ID %d",
-                    userId, itemId));
+            throw new ValidateException(String.format("Предмет ID %d уже забронирован", itemId));
         }
 
         Comment comment = CommentMapper.toModel(commentDto);

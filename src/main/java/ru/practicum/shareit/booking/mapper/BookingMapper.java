@@ -13,7 +13,7 @@ public class BookingMapper {
         bookingResponseDto.setId(booking.getId());
         bookingResponseDto.setStart(booking.getStart());
         bookingResponseDto.setEnd(booking.getEnd());
-        bookingResponseDto.setItem(new BookingResponseDto.Item(
+        bookingResponseDto.setItem(new BookingResponseDto.BookingItemDto(
                 booking.getItem().getId(),
                 booking.getItem().getName()
         ));

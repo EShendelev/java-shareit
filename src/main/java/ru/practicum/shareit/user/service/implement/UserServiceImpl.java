@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public UserDto get(Long id) {
-        checkAndReturnUser(id);
+        checkUser(id);
         UserDto user = UserMapper.toDto(userRepository.getById(id));
         log.debug("UserService: Выполняется вывод пользователя ID {}", id);
         return user;
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void delete(Long id) {
-        checkAndReturnUser(id);
+        checkUser(id);
         log.debug("UserService: Удаляется пользователь ID {}", id);
         userRepository.deleteById(id);
     }
@@ -74,6 +74,12 @@ public class UserServiceImpl implements UserService {
     private User checkAndReturnUser(Long id) {
         return userRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь ID %d не найден", id))
+        );
+    }
+
+    private void checkUser(Long id) {
+        userRepository.checkIdValue(id).orElseThrow(
+                () -> new NotFoundException(String.format("Бронирование ID %d не найдено", id))
         );
     }
 }

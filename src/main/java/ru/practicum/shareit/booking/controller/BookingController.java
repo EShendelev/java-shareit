@@ -8,7 +8,6 @@ import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.service.interfaces.BookingService;
-import ru.practicum.shareit.exception.StatusNotExistException;
 import ru.practicum.shareit.exception.ValidateException;
 import ru.practicum.shareit.validmark.Create;
 
@@ -29,9 +28,7 @@ public class BookingController {
     public Collection<BookingResponseDto> findAllByState(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(name = "state", defaultValue = "ALL") String stateText) {
-        if (!Status.checkValidStatus(stateText)) {
-            throw new StatusNotExistException("Unknown state: " + stateText);
-        }
+        Status.checkValidStatus(stateText);
         log.info("BookingController. GET /bookings. User ID {}, {}", userId, stateText);
         return bookingService.getAllByState(userId, stateText);
     }
@@ -40,9 +37,7 @@ public class BookingController {
     public Collection<BookingResponseDto> findAllByOwnerIdAndState(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(name = "state", defaultValue = "ALL") String stateText) {
-        if (!Status.checkValidStatus(stateText)) {
-            throw new StatusNotExistException("Unknown state: " + stateText);
-        }
+        Status.checkValidStatus(stateText);
         log.info("BookingController. GET /owner. User ID {}, {}", userId, stateText);
         return bookingService.getAllByOwnerIdAndState(userId, stateText);
     }
@@ -60,7 +55,8 @@ public class BookingController {
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @Validated(Create.class) @RequestBody BookingRequestDto bookingRequestDto) {
         if (!bookingRequestDto.getEnd().isAfter(bookingRequestDto.getStart())) {
-            throw new ValidateException("Некорректно задано время бронирования");
+            throw new ValidateException(String.format("Ошибка: Время конца бронирования %s перед временем начала %s",
+                    bookingRequestDto.getEnd(), bookingRequestDto.getStart()));
         }
         log.info("BookingController: POST /booking. User ID {}.", userId);
         return bookingService.save(userId, bookingRequestDto);
@@ -71,9 +67,6 @@ public class BookingController {
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long bookingId,
             @RequestParam Boolean approved) {
-        if (approved == null) {
-            throw new ValidateException("Некорректно задан параметр подтверждения");
-        }
         log.info("BookingController: PATCH /{bookingId}. User ID {}, booking ID {}.", userId, bookingId);
         return bookingService.updateState(userId, bookingId, approved);
     }

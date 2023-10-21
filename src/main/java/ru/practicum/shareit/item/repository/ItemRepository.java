@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
@@ -16,8 +17,13 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "AND i.available = true")
     List<Item> search(String text);
 
-    @Query("SELECT i FROM Item i " +
-            "WHERE i.owner.id = :userId " +
-            "ORDER BY i.id")
-    List<Item> findAllByOwnerId(Long userId);
+    List<Item> findAllByOwnerIdOrderById(Long userId);
+
+    @Query("SELECT i.id FROM Item i")
+    List<Long> getItemsId(Long userId);
+
+    @Query(value = "SELECT i.id FROM items i " +
+            "WHERE i.id = ?1",
+            nativeQuery = true)
+    Optional<Long> checkIdValue(Long itemId);
 }

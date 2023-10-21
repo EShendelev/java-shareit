@@ -77,8 +77,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public ItemResponseDto findById(Long userId, Long itemId) {
-        checkAndReturnUser(userId);
-         Item item = checkAndReturnItem(itemId);
+        checkUser(userId);
+        Item item = checkAndReturnItem(itemId);
 
         ItemResponseDto itemResponseDto = ItemMapper.toDtoResponse(item);
         List<Comment> comments = commentRepository.findAllByItemId(itemId);
@@ -90,12 +90,8 @@ public class ItemServiceImpl implements ItemService {
         );
 
 
-        List<Booking> lastBookings = bookingRepository.findLastBooking(LocalDateTime.now(), userId, itemId);
-        List<Booking> nextBookings = bookingRepository.findNextBooking(LocalDateTime.now(), userId, itemId);
-        Booking lastBooking = bookingRepository.findLastBooking(LocalDateTime.now(), userId, itemId)
-                .stream().findFirst().orElse(null);
-        Booking nextBooking = bookingRepository.findNextBooking(LocalDateTime.now(), userId, itemId)
-                .stream().findFirst().orElse(null);
+        Booking lastBooking = bookingRepository.findLastBooking(LocalDateTime.now(), userId, itemId);
+        Booking nextBooking = bookingRepository.findNextBooking(LocalDateTime.now(), userId, itemId);
 
         itemResponseDto.setLastBooking(lastBooking == null ? null : new ItemResponseDto.ItemBooking(
                 lastBooking.getId(),
@@ -111,14 +107,15 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public Collection<ItemResponseDto> findAllByOwnerId(Long ownerId) {
-        checkAndReturnUser(ownerId);
-        List<Item> items = itemRepository.findAllByOwnerId(ownerId);
-        Map<Item, List<Comment>> itemsWithComments = commentRepository.findAllByItemIn(
-                        items, Sort.by(Sort.Direction.DESC, "created"))
+        checkUser(ownerId);
+        List<Long> itemIds = itemRepository.getItemsId(ownerId);
+        List<Item> items = itemRepository.findAllByOwnerIdOrderById(ownerId);
+        Map<Item, List<Comment>> itemsWithComments = commentRepository.findAllByItemIdIn(
+                        itemIds, Sort.by(Sort.Direction.DESC, "created"))
                 .stream()
                 .collect(Collectors.groupingBy(Comment::getItem, Collectors.toList()));
-        Map<Item, List<Booking>> itemsWithBookings = bookingRepository.findAllByItemInAndStatus(
-                        items, Status.APPROVED, Sort.by(Sort.Direction.DESC, "start"))
+        Map<Item, List<Booking>> itemsWithBookings = bookingRepository.findAllByItemIdInAndStatus(
+                        itemIds, Status.APPROVED, Sort.by(Sort.Direction.DESC, "start"))
                 .stream()
                 .collect(Collectors.groupingBy(Booking::getItem, Collectors.toList()));
 
@@ -176,8 +173,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void delete(Long userId, Long itemId) {
-        checkAndReturnItem(itemId);
-        checkAndReturnUser(userId);
+        checkItem(itemId);
+        checkUser(userId);
         itemRepository.deleteById(itemId);
         log.debug("ItemService: delete");
     }
@@ -191,6 +188,18 @@ public class ItemServiceImpl implements ItemService {
     private Item checkAndReturnItem(Long id) {
         return itemRepository.findById(id).orElseThrow(
                 () -> new NotFoundException(String.format("Предмет ID %d не найден", id))
+        );
+    }
+
+    private void checkItem(Long id) {
+        itemRepository.checkIdValue(id).orElseThrow(
+                () -> new NotFoundException(String.format("Предмет ID %d не найдено", id))
+        );
+    }
+
+    private void checkUser(Long id) {
+        userRepository.checkIdValue(id).orElseThrow(
+                () -> new NotFoundException(String.format("Пользователь ID %d не найдено", id))
         );
     }
 }
