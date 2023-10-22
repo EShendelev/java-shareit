@@ -78,7 +78,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             nativeQuery = true)
     Optional<Long> checkIdValue(Long itemId);
 
-    @Query(value = "SELECT count(*) FROM bookings",
+    @Query(value = "SELECT count(*) FROM bookings b " +
+            "LEFT JOIN public.items i on i.id = b.item_id " +
+            "WHERE i.owner_id = ?1",
     nativeQuery = true)
     int findBookinsCountByOwnerId(Long ownerId);
 }
