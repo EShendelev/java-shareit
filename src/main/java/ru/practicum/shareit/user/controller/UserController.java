@@ -5,16 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.mapper.UserMapper;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.interfaces.UserService;
 import ru.practicum.shareit.validmark.Create;
 import ru.practicum.shareit.validmark.Update;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 /**
  * TODO Sprint add-controllers.
@@ -29,35 +25,33 @@ public class UserController {
 
     @GetMapping
     public Collection<UserDto> getAll() {
-        Collection<User> users = userService.getAll();
-        Collection<UserDto> userDtos = users.stream().map(UserMapper::toDto).collect(Collectors.toList());
+        Collection<UserDto> users = userService.getAll();
         log.info("Вывод списка всех пользователей");
-        return userDtos;
+        return users;
     }
 
     @GetMapping("/{id}")
     public UserDto get(@PathVariable("id") long id) {
-        User user = userService.get(id);
+        UserDto user = userService.get(id);
         log.info("Получен пользовать ID {}", id);
-        return UserMapper.toDto(user);
+        return user;
     }
 
     @PostMapping
-    public UserDto create(@Validated({Create.class}) @RequestBody UserDto userDto) {
-        User user = userService.create(UserMapper.toModel(userDto, null));
+    public UserDto save(@Validated({Create.class}) @RequestBody UserDto userDto) {
+        UserDto user = userService.save(userDto);
         log.info("Создан пользовать ID {}", user.getId());
-        return UserMapper.toDto(user);
+        return user;
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{userId}")
     public UserDto update(@NotNull(message = "поле ID не может быть пустым")
-                          @Min(1)
-                          @PathVariable("id") long id,
+                          @PathVariable Long userId,
                           @Validated({Update.class})
                           @RequestBody UserDto userDto) {
-        User user = userService.update(UserMapper.toModel(userDto, id));
-        log.info("Обновлена информация пользователя ID {}", id);
-        return UserMapper.toDto(user);
+        UserDto user = userService.update(userId, userDto);
+        log.info("Обновлена информация пользователя ID {}", userId);
+        return user;
     }
 
     @DeleteMapping("/{id}")

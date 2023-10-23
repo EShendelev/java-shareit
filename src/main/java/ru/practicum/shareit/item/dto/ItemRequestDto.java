@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.shareit.validmark.Create;
@@ -13,8 +12,7 @@ import javax.validation.constraints.NotNull;
  */
 @Getter
 @Setter
-@Builder
-public class ItemDto {
+public class ItemRequestDto {
     private long id;
     @NotBlank(groups = Create.class)
     private String name;

@@ -1,41 +1,36 @@
 package ru.practicum.shareit.item.mapper;
 
-import ru.practicum.shareit.item.dto.ItemDto;
+import org.springframework.stereotype.Component;
+import ru.practicum.shareit.item.dto.ItemRequestDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.repository.UserStorage;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
 
+@Component
 public class ItemMapper {
-    private UserStorage userStorage;
 
-    public static ItemDto toDto(Item item) {
-        return ItemDto.builder()
-                .id(item.getId())
-                .name(item.getName())
-                .description(item.getDescription())
-                .available(item.getAvailable())
-                .build();
+    public static ItemResponseDto toDtoResponse(Item item) {
+        ItemResponseDto itemResponseDto = new ItemResponseDto();
+        Long ownerId = item.getOwner().getId();
+        String ownerName = item.getName();
+        itemResponseDto.setId(item.getId());
+        itemResponseDto.setName(item.getName());
+        itemResponseDto.setDescription(item.getDescription());
+        itemResponseDto.setAvailable(item.getAvailable());
+        itemResponseDto.setOwner(new ItemResponseDto.ItemOwner(ownerId, ownerName));
+        itemResponseDto.setLastBooking(null);
+        itemResponseDto.setNextBooking(null);
+        itemResponseDto.setComments(new ArrayList<>());
+        return itemResponseDto;
     }
 
-    public static Item toModel(ItemDto itemDto, Long ownerId) {
-        return Item.builder()
-                .name(itemDto.getName())
-                .description(itemDto.getDescription())
-                .available(itemDto.getAvailable())
-                .ownerId(ownerId)
-                .request(null)
-                .build();
-    }
-
-    public static Item toModelForUpdate(ItemDto itemDto, Long itemId, Long ownerId) {
-        Item item = toModel(itemDto, ownerId);
-        item.setId(itemId);
+    public static Item toModel(ItemRequestDto itemRequestDto) {
+        Item item = new Item();
+        item.setId(itemRequestDto.getId());
+        item.setName(itemRequestDto.getName());
+        item.setAvailable(itemRequestDto.getAvailable());
+        item.setDescription(itemRequestDto.getDescription());
         return item;
-    }
-
-    public static Collection<ItemDto> toDtoCollection(Collection<Item> items) {
-        return items.stream().map(ItemMapper::toDto).collect(Collectors.toList());
     }
 }
