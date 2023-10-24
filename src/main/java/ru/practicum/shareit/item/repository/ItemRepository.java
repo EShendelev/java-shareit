@@ -26,4 +26,8 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "WHERE i.id = ?1",
             nativeQuery = true)
     Optional<Long> checkIdValue(Long itemId);
+
+    List<Item> findAllByRequestId(Long requestId);
+
+    List<Item> findAllByRequestIn(List<Request> requests);
 }
