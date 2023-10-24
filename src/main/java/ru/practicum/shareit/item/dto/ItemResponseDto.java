@@ -17,6 +17,7 @@ public class ItemResponseDto {
     private ItemBooking lastBooking;
     private ItemBooking nextBooking;
     private List<CommentDto> comments;
+    private Long requestId;
 
     @Data
     public static class ItemOwner {
