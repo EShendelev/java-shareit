@@ -13,7 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-
 public class RequestItemDto {
     private Long id;
     @NotBlank(groups = {Create.class})

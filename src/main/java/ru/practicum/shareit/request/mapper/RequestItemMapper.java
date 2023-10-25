@@ -10,7 +10,9 @@ public class RequestItemMapper {
 
     public static RequestItem toModel(RequestItemDto requestItemDto) {
         RequestItem request = new RequestItem();
-        request.setId(requestItemDto.getId());
+        if (requestItemDto.getId() != null) {
+            request.setId(requestItemDto.getId());
+        }
         request.setDescription(requestItemDto.getDescription());
         return request;
     }

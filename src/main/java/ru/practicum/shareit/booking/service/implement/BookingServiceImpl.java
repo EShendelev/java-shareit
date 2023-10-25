@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
@@ -22,6 +23,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,8 +38,13 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public Collection<BookingResponseDto> getAllByState(Long userId, String stateText, int from, int size) {
+        if (from < 0 || size <= 0) {
+            throw new ValidateException("параметр from не может быть меньше 0 и size меньше или равен 0 ");
+        }
         checkUser(userId);
+        Pageable pageableDescSort = createPageRequestDescSort(from, size);
         Pageable pageable = createPageRequest(from, size);
+
         switch (Status.valueOf(stateText)) {
             case CURRENT:
                 log.debug("BookingService: поиск всех бронирований по cостоянию. Пользователь ID {}, состояние {}",
@@ -45,7 +52,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findByBookerIdAndCurrent(
                                 userId,
                                 LocalDateTime.now(),
-                                pageable)
+                                pageableDescSort)
                         .stream()
                         .map(BookingMapper::toResponseDto)
                         .collect(Collectors.toList());
@@ -55,7 +62,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findByBookerIdAndEndIsBefore(
                                 userId,
                                 LocalDateTime.now(),
-                                pageable)
+                                pageableDescSort)
                         .stream()
                         .map(BookingMapper::toResponseDto)
                         .collect(Collectors.toList());
@@ -77,7 +84,7 @@ public class BookingServiceImpl implements BookingService {
                         .findByBookerIdAndStatus(
                                 userId,
                                 Status.WAITING,
-                                pageable)
+                                pageableDescSort)
                         .stream()
                         .map(BookingMapper::toResponseDto)
                         .collect(Collectors.toList());
@@ -88,20 +95,21 @@ public class BookingServiceImpl implements BookingService {
                         .findByBookerIdAndStatus(
                                 userId,
                                 Status.REJECTED,
-                                pageable)
+                                pageableDescSort)
                         .stream()
                         .map(BookingMapper::toResponseDto)
                         .collect(Collectors.toList());
             default:
                 log.info("BookingService: поиск всех бронирований по состоянию. Пользователь ID {}," +
                         " состояние по умолчанию", userId);
-                return bookingRepository
+                List<BookingResponseDto> listDto = bookingRepository
                         .findByBookerId(
                                 userId,
-                                pageable)
+                                pageableDescSort)
                         .stream()
                         .map(BookingMapper::toResponseDto)
                         .collect(Collectors.toList());
+                return listDto;
         }
     }
 
@@ -109,8 +117,12 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public Collection<BookingResponseDto> getAllByOwnerIdAndState(Long userId, String stateText, int from, int size) {
+        if (from < 0 || size <= 0) {
+            throw new ValidateException("параметр from не может быть меньше 0 и size меньше или равен 0 ");
+        }
         checkUser(userId);
 
+        Pageable pageableDestSort = createPageRequestDescSort(from, size);
         Pageable pageable = createPageRequest(from, size);
 
         int countOfBookings = bookingRepository.findBookinsCountByOwnerId(userId);
@@ -126,7 +138,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findByItemOwnerIdAndCurrent(
                                 userId,
                                 LocalDateTime.now(),
-                                pageable)
+                                pageableDestSort)
                         .stream()
                         .map(BookingMapper::toResponseDto)
                         .collect(Collectors.toList()
@@ -137,7 +149,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findByItemOwnerIdAndEndIsBefore(
                                 userId,
                                 LocalDateTime.now(),
-                                pageable)
+                                pageableDestSort)
                         .stream()
                         .map(BookingMapper::toResponseDto)
                         .collect(Collectors.toList()
@@ -159,7 +171,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findByItemOwnerIdAndStatus(
                                 userId,
                                 Status.WAITING,
-                                pageable)
+                                pageableDestSort)
                         .stream()
                         .map(BookingMapper::toResponseDto)
                         .collect(Collectors.toList()
@@ -170,7 +182,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findByItemOwnerIdAndStatus(
                                 userId,
                                 Status.REJECTED,
-                                pageable)
+                                pageableDestSort)
                         .stream()
                         .map(BookingMapper::toResponseDto)
                         .collect(Collectors.toList()
@@ -180,7 +192,7 @@ public class BookingServiceImpl implements BookingService {
                         "состояние {}", userId, stateText);
                 return bookingRepository.findByItemOwnerId(
                                 userId,
-                                pageable)
+                                pageableDestSort)
                         .stream()
                         .map(BookingMapper::toResponseDto)
                         .collect(Collectors.toList());
@@ -284,7 +296,11 @@ public class BookingServiceImpl implements BookingService {
         );
     }
 
+    private PageRequest createPageRequestDescSort(int from, int size) {
+        return PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "start"));
+    }
+
     private PageRequest createPageRequest(int from, int size) {
-        return PageRequest.of(from / size, size);
+        return PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "start"));
     }
 }

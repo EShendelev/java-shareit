@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidateException;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -35,6 +36,9 @@ public class RequestItemServiceImpl implements RequestItemService {
     @Transactional(readOnly = true)
     @Override
     public List<RequestItemDto> findAll(Long userId, int from, int size) {
+        if (from < 0 || size <= 0) {
+            throw new ValidateException("параметр from не может быть меньше 0 и size меньше или равен 0 ");
+        }
         checkUser(userId);
         PageRequest pageRequest = createPageRequest(from, size);
 
@@ -48,8 +52,7 @@ public class RequestItemServiceImpl implements RequestItemService {
     @Override
     public List<RequestItemDto> findAllByUserId(Long userId) {
         checkUser(userId);
-
-        List<RequestItem> requestItems = requestItemRepository.findAllByRequestorIdOrderByCreateAsc(userId);
+        List<RequestItem> requestItems = requestItemRepository.findAllByRequestorIdOrderByCreatedAsc(userId);
         log.info("RequestService: findAllByUserId ID {}", userId);
         return getRequestDtos(requestItems);
     }
@@ -110,7 +113,7 @@ public class RequestItemServiceImpl implements RequestItemService {
     private List<RequestItemDto> getRequestDtos(List<RequestItem> requestItems) {
         Map<RequestItem, List<Item>> itemAll = itemRepository.findAllByRequestIn(requestItems)
                 .stream()
-                .collect(Collectors.groupingBy(Item::getRequestItem, Collectors.toList()));
+                .collect(Collectors.groupingBy(Item::getRequest, Collectors.toList()));
 
         return requestItems.stream()
                 .map(requestItem -> {
