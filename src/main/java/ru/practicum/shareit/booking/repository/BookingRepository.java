@@ -21,29 +21,29 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "AND :time BETWEEN b.start AND b.end")
     List<Booking> findByBookerIdAndCurrent(Long userId, LocalDateTime time, Pageable pageable);
 
-    List<Booking> findByBookerIdAndEndIsBefore(Long userId, LocalDateTime time, Pageable pageable);
+    List<Booking> findByBookerIdAndEndIsBeforeOrderByStartDesc(Long userId, LocalDateTime time, Pageable pageable);
 
     List<Booking> findByBookerIdAndStartIsAfter(Long userId, LocalDateTime time, Pageable pageable);
 
-    List<Booking> findByBookerIdAndStatus(Long userId, Status status, Pageable pageable);
+    List<Booking> findByBookerIdAndStatusOrderByStartDesc(Long userId, Status status, Pageable pageable);
 
-    List<Booking> findByBookerId(Long userId, Pageable pageable);
+    List<Booking> findByBookerIdOrderByStartDesc(Long userId, Pageable pageable);
 
-    List<Booking> findByItemOwnerId(Long id, Pageable pageable);
+    List<Booking> findByItemOwnerIdOrderByStartDesc(Long id, Pageable pageable);
 
     @Query("SELECT b FROM Booking b " +
             "LEFT JOIN Item AS i ON b.item.id = i.id " +
             "LEFT JOIN User AS us ON i.owner.id = us.id " +
             "WHERE us.id = :userId " +
             "AND :time > b.start AND :time < b.end ")
-    List<Booking> findByItemOwnerIdAndCurrent(Long userId, LocalDateTime time, Pageable pageable);
+    List<Booking> findByItemOwnerIdAndCurrentOrderByStartDesc(Long userId, LocalDateTime time, Pageable pageable);
 
 
-    List<Booking> findByItemOwnerIdAndEndIsBefore(Long userId, LocalDateTime time, Pageable pageable);
+    List<Booking> findByItemOwnerIdAndEndIsBeforeOrderByStartDesc(Long userId, LocalDateTime time, Pageable pageable);
 
     List<Booking> findByItemOwnerIdAndStartIsAfter(Long id, LocalDateTime time, Pageable pageable);
 
-    List<Booking> findByItemOwnerIdAndStatus(Long id, Status status, Pageable pageable);
+    List<Booking> findByItemOwnerIdAndStatusOrderByStartDesc(Long id, Status status, Pageable pageable);
 
     List<Booking> findByBookerIdAndItemIdAndEndIsBefore(Long id, Long itemId, LocalDateTime time);
 
