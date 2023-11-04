@@ -1,4 +1,4 @@
-package ru.practicum.shareit.repository;
+package ru.practicum.shareit.booking.repository;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -11,11 +11,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
-import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
