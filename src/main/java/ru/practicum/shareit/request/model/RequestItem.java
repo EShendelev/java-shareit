@@ -19,7 +19,7 @@ public class RequestItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private long id;
+    private Long id;
     @Column(name = "description", length = 512, nullable = false)
     private String description;
     @ManyToOne
