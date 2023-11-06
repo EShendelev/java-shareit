@@ -90,19 +90,19 @@ public class RequestItemServiceImpl implements RequestItemService {
 
     private void checkItem(Long id) {
         itemRepository.checkIdValue(id).orElseThrow(
-                () -> new NotFoundException(String.format("Предмет ID %d не найдено", id))
+                () -> new NotFoundException(String.format("Предмет ID %d не найден", id))
         );
     }
 
     private User checkAndReturnUser(Long id) {
         return userRepository.findById(id).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь  ID %d не найден", id))
+                () -> new NotFoundException(String.format("Пользователь ID %d не найден", id))
         );
     }
 
     private void checkUser(Long id) {
         userRepository.checkIdValue(id).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь ID %d не найдено", id))
+                () -> new NotFoundException(String.format("Пользователь ID %d не найден", id))
         );
     }
 
