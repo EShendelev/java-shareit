@@ -26,16 +26,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(RequestItemController.class)
 @AutoConfigureMockMvc
 public class RequestItemControllerMock {
+
     @MockBean
     RequestItemService requestItemService;
-    
+
     @Autowired
     MockMvc mockMvc;
-    
+
     @Autowired
     ObjectMapper mapper;
 
     private static final String SHAREIT_HEADER = "X-Sharer-User-Id";
+
     @Test
     void findAllTest() throws Exception {
         RequestItemDto request = new RequestItemDto(

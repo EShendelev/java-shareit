@@ -83,5 +83,5 @@ public class RequestItemControllerTest {
     void saveTestWithWrongUserId() {
         assertThrows(NotFoundException.class, () -> requestItemController.save(1L, itemRequestDto));
     }
-    
+
 }
