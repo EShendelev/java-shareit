@@ -52,8 +52,10 @@ class BookingControllerTest {
 
         bookingRequestDto = new BookingRequestDto(
                 null,
-                LocalDateTime.of(2023, 10, 24, 12, 30),
-                LocalDateTime.of(2023, 11, 10, 13, 0),
+                LocalDateTime.now(),
+                LocalDateTime.now().plusDays(7),
+//                LocalDateTime.of(2023, 11, 24, 12, 30),
+//                LocalDateTime.of(2023, 12, 10, 13, 0),
                 null);
     }
 
@@ -170,14 +172,6 @@ class BookingControllerTest {
                 .findAllByState(1L, "ALL", 0, 10));
         assertThrows(NotFoundException.class, () -> bookingController
                 .findAllByOwnerIdAndState(1L, "ALL", 0, 10));
-    }
-
-    @Test
-    void findAllTestsWithWrongForm() {
-        assertThrows(ValidateException.class, () -> bookingController
-                .findAllByState(1L, "ALL", -1, 10));
-        assertThrows(ValidateException.class, () -> bookingController
-                .findAllByOwnerIdAndState(1L, "ALL", -1, 10));
     }
 
     @Test

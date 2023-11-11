@@ -38,9 +38,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public Collection<BookingResponseDto> getAllByState(Long userId, String stateText, int from, int size) {
-        if (from < 0 || size <= 0) {
-            throw new ValidateException("параметр from не может быть меньше 0 и size меньше или равен 0 ");
-        }
         checkUser(userId);
         Pageable pageable = createPageRequest(from, size);
 
@@ -116,9 +113,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional(readOnly = true)
     public Collection<BookingResponseDto> getAllByOwnerIdAndState(Long userId, String stateText, int from, int size) {
-        if (from < 0 || size <= 0) {
-            throw new ValidateException("параметр from не может быть меньше 0 и size меньше или равен 0 ");
-        }
         checkUser(userId);
 
         Pageable pageable = createPageRequest(from, size);

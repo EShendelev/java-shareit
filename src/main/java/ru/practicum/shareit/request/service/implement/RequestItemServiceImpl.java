@@ -43,7 +43,7 @@ public class RequestItemServiceImpl implements RequestItemService {
         PageRequest pageRequest = createPageRequest(from, size);
 
         List<RequestItem> requestItems = requestItemRepository.findAllByRequestorIdNotLike(userId, pageRequest);
-        log.info("RequestService: поиск всех запросов пользователя ID {}", userId);
+        log.info("RequestService: поиск всех запросов доступных для пользователя ID {}", userId);
 
         return getRequestDtos(requestItems);
     }
@@ -61,8 +61,8 @@ public class RequestItemServiceImpl implements RequestItemService {
     @Override
     public RequestItemDto findById(Long userId, Long requestId) {
         checkUser(userId);
-        RequestItem requestItem = requestItemRepository.findById(requestId)
-                .orElseThrow(() -> new NotFoundException(String.format("Запрос ID %d не найден", requestId)));
+
+        RequestItem requestItem = checkAndReturnRequest(requestId);
 
         RequestItemDto requestItemDto = RequestItemMapper.toDto(requestItem);
         requestItemDto.setItems(itemRepository.findAllByRequestId(requestItem.getId()).stream()
@@ -106,19 +106,29 @@ public class RequestItemServiceImpl implements RequestItemService {
         );
     }
 
+    private RequestItem checkAndReturnRequest(Long requestId) {
+        return requestItemRepository.findById(requestId)
+                .orElseThrow(() -> new NotFoundException(String.format("Запрос ID %d не найден", requestId)));
+    }
+
+
     private PageRequest createPageRequest(int from, int size) {
         return PageRequest.of(from / size, size);
     }
 
     private List<RequestItemDto> getRequestDtos(List<RequestItem> requestItems) {
-        Map<RequestItem, List<Item>> itemAll = itemRepository.findAllByRequestIn(requestItems)
+        Map<Long, List<Item>> itemAll = itemRepository.findAllByRequestIn(requestItems)
                 .stream()
-                .collect(Collectors.groupingBy(Item::getRequest, Collectors.toList()));
+                .collect(Collectors.groupingBy(
+                        item -> {
+                            RequestItem requestItem = item.getRequest();
+                            return requestItem.getId();
+                        }, Collectors.toList()));
 
         return requestItems.stream()
                 .map(requestItem -> {
                     RequestItemDto requestItemDto = RequestItemMapper.toDto(requestItem);
-                    List<Item> itemList = itemAll.getOrDefault(requestItem, Collections.emptyList());
+                    List<Item> itemList = itemAll.getOrDefault(requestItem.getId(), Collections.emptyList());
                     requestItemDto.setItems(itemList.stream().map(ItemMapper::toDtoResponse)
                             .collect(Collectors.toList()));
                     return requestItemDto;

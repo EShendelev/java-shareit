@@ -22,6 +22,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
 @Slf4j
+@Validated
 public class BookingController {
 
     private final BookingService bookingService;
@@ -34,7 +35,7 @@ public class BookingController {
             @PositiveOrZero int from,
             @RequestParam(value = "size", defaultValue = "10")
             @Positive int size) {
-      Status.checkValidStatus(stateText);
+        Status.checkValidStatus(stateText);
         log.info("BookingController. GET /bookings. User ID {}, {}", userId, stateText);
         return bookingService.getAllByState(userId, stateText, from, size);
     }

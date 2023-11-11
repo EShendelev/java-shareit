@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.annotation.Rollback;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.model.Item;
@@ -20,7 +19,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @DataJpaTest
-@Rollback(value = false)
 class BookingRepositoryTest {
 
     @Autowired
