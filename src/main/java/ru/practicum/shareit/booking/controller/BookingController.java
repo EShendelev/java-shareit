@@ -11,6 +11,8 @@ import ru.practicum.shareit.booking.service.interfaces.BookingService;
 import ru.practicum.shareit.exception.ValidateException;
 import ru.practicum.shareit.validmark.Create;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
 /**
@@ -20,6 +22,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
 @Slf4j
+@Validated
 public class BookingController {
 
     private final BookingService bookingService;
@@ -27,19 +30,27 @@ public class BookingController {
     @GetMapping
     public Collection<BookingResponseDto> findAllByState(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(name = "state", defaultValue = "ALL") String stateText) {
+            @RequestParam(name = "state", defaultValue = "ALL") String stateText,
+            @RequestParam(value = "from", defaultValue = "0")
+            @PositiveOrZero int from,
+            @RequestParam(value = "size", defaultValue = "10")
+            @Positive int size) {
         Status.checkValidStatus(stateText);
         log.info("BookingController. GET /bookings. User ID {}, {}", userId, stateText);
-        return bookingService.getAllByState(userId, stateText);
+        return bookingService.getAllByState(userId, stateText, from, size);
     }
 
     @GetMapping(value = "/owner")
     public Collection<BookingResponseDto> findAllByOwnerIdAndState(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(name = "state", defaultValue = "ALL") String stateText) {
+            @RequestParam(name = "state", defaultValue = "ALL") String stateText,
+            @RequestParam(value = "from", defaultValue = "0")
+            @PositiveOrZero int from,
+            @RequestParam(value = "size", defaultValue = "10")
+            @Positive int size) {
         Status.checkValidStatus(stateText);
         log.info("BookingController. GET /owner. User ID {}, {}", userId, stateText);
-        return bookingService.getAllByOwnerIdAndState(userId, stateText);
+        return bookingService.getAllByOwnerIdAndState(userId, stateText, from, size);
     }
 
     @GetMapping(value = "/{bookingId}")

@@ -8,15 +8,6 @@ import ru.practicum.shareit.exception.*;
 
 @RestControllerAdvice
 public class ErrorHandler {
-    /**
-     * ItemOwnerFailEx
-     */
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handle(EmailConflictException e) {
-        return new ErrorResponse(e.getMessage());
-    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)

@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service.implement;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,8 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.interfaces.ItemService;
+import ru.practicum.shareit.request.model.RequestItem;
+import ru.practicum.shareit.request.repository.RequestItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -33,14 +36,18 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
+    private final RequestItemRepository requestItemRepository;
 
 
     @Override
     @Transactional
     public ItemResponseDto save(ItemRequestDto itemRequestDto, long ownerId) {
         User user = checkAndReturnUser(ownerId);
+        RequestItem requestItem =
+                itemRequestDto.getRequestId() == null ? null : checkAndReturnRequestItem(itemRequestDto.getRequestId());
         Item item = ItemMapper.toModel(itemRequestDto);
         item.setOwner(user);
+        item.setRequest(requestItem);
         Item saveItem = itemRepository.save(item);
         log.info("ItemService: сохранение предмета ID {} пользователя ID {}", item.getId(), ownerId);
         return ItemMapper.toDtoResponse(saveItem);
@@ -106,10 +113,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<ItemResponseDto> findAllByOwnerId(Long ownerId) {
+    public Collection<ItemResponseDto> findAllByOwnerId(Long ownerId, int from, int size) {
         checkUser(ownerId);
         List<Long> itemIds = itemRepository.getItemsId(ownerId);
-        List<Item> items = itemRepository.findAllByOwnerIdOrderById(ownerId);
+        List<Item> items = itemRepository.findAllByOwnerIdOrderById(ownerId, PageRequest.of(from, size));
         Map<Item, List<Comment>> itemsWithComments = commentRepository.findAllByItemIdIn(
                         itemIds, Sort.by(Sort.Direction.DESC, "created"))
                 .stream()
@@ -159,13 +166,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<ItemResponseDto> findItemByText(String text) {
+    public Collection<ItemResponseDto> findItemByText(String text, int from, int size) {
         if (text.isEmpty()) {
             log.info("Пустой поисковый запрос");
             return new ArrayList<>();
         }
         log.info("ItemService: поиск по совпадениям. Запрос: {}", text);
-        return itemRepository.search(text)
+        return itemRepository.search(text, PageRequest.of(from, size))
                 .stream()
                 .map(ItemMapper::toDtoResponse)
                 .collect(Collectors.toList());
@@ -193,13 +200,25 @@ public class ItemServiceImpl implements ItemService {
 
     private void checkItem(Long id) {
         itemRepository.checkIdValue(id).orElseThrow(
-                () -> new NotFoundException(String.format("Предмет ID %d не найдено", id))
+                () -> new NotFoundException(String.format("Предмет ID %d не найден", id))
         );
     }
 
     private void checkUser(Long id) {
         userRepository.checkIdValue(id).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь ID %d не найдено", id))
+                () -> new NotFoundException(String.format("Пользователь ID %d не найден", id))
+        );
+    }
+
+    private RequestItem checkAndReturnRequestItem(Long id) {
+        return requestItemRepository.findById(id).orElseThrow(
+                () -> new NotFoundException(String.format("Запрос ID %d не найден", id))
+        );
+    }
+
+    private void checkRequestItem(Long id) {
+        requestItemRepository.checkIdValue(id).orElseThrow(
+                () -> new NotFoundException(String.format("Запрос ID %d не найден", id))
         );
     }
 }

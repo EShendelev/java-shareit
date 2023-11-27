@@ -43,7 +43,7 @@ public class CommentServiceImpl implements CommentService {
 
         boolean bookingApproved = countApproveBookings == 0;
         if (bookingApproved) {
-            throw new ValidateException(String.format("Бронирование предмета ID %d еще не подтверждено влдадельцем " +
+            throw new ValidateException(String.format("предмет ID %d не был в аренде у пользователя " +
                     "ID %d", itemId, userId));
         }
 

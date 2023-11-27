@@ -6,9 +6,9 @@ import ru.practicum.shareit.item.dto.ItemResponseDto;
 import java.util.Collection;
 
 public interface ItemService {
-    Collection<ItemResponseDto> findAllByOwnerId(Long userId);
+    Collection<ItemResponseDto> findAllByOwnerId(Long userId, int from, int size);
 
-    Collection<ItemResponseDto> findItemByText(String request);
+    Collection<ItemResponseDto> findItemByText(String request, int from, int size);
 
     ItemResponseDto save(ItemRequestDto itemRequestDto, long userId);
 

@@ -15,6 +15,8 @@ import ru.practicum.shareit.validmark.Update;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
 /**
@@ -61,8 +63,12 @@ public class ItemController {
     @GetMapping
     public Collection<ItemResponseDto> getAllUserItems(@Min(1)
                                                        @NotNull
-                                                       @RequestHeader(REQUEST_HEADER) Long ownerId) {
-        Collection<ItemResponseDto> itemsList = itemService.findAllByOwnerId(ownerId);
+                                                       @RequestHeader(REQUEST_HEADER) Long ownerId,
+                                                       @RequestParam(value = "from", defaultValue = "0")
+                                                       @PositiveOrZero int from,
+                                                       @RequestParam(value = "size", defaultValue = "10")
+                                                       @Positive int size) {
+        Collection<ItemResponseDto> itemsList = itemService.findAllByOwnerId(ownerId, from, size);
         log.info("Получен список всех предметов");
         return itemsList;
     }
@@ -76,8 +82,12 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public Collection<ItemResponseDto> searchByTextRequest(@RequestParam String text) {
-        Collection<ItemResponseDto> itemsList = itemService.findItemByText(text);
+    public Collection<ItemResponseDto> searchByTextRequest(@RequestParam String text,
+                                                           @RequestParam(value = "from", defaultValue = "0")
+                                                           @PositiveOrZero int from,
+                                                           @RequestParam(value = "size", defaultValue = "10")
+                                                               @Positive int size) {
+        Collection<ItemResponseDto> itemsList = itemService.findItemByText(text, from, size);
         log.info("Получен список предметов подходящих под запрос \"{}\"", text);
         return itemsList;
     }
