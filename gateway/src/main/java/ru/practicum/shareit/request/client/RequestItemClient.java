@@ -23,22 +23,22 @@ public class RequestItemClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> getAll(long userId, int from, int size) {
+    public ResponseEntity<Object> findAll(long userId, int from, int size) {
         Map<String, Object> parameters = Map.of(
                 "from", from,
                 "size", size);
         return get("/all?from={from}&size={size}", userId, parameters);
     }
 
-    public ResponseEntity<Object> createItemRequest(long userId, RequestItemDto requestItemDto) {
+    public ResponseEntity<Object> save(long userId, RequestItemDto requestItemDto) {
         return post("", userId, requestItemDto);
     }
 
-    public ResponseEntity<Object> getItemRequestsByUser(long userId) {
+    public ResponseEntity<Object> findAllByUserId(long userId) {
         return get("", userId);
     }
 
-    public ResponseEntity<Object> getItemRequest(Long requestId, long userId) {
+    public ResponseEntity<Object> findById(Long requestId, long userId) {
         return get("/" + requestId, userId);
     }
 }

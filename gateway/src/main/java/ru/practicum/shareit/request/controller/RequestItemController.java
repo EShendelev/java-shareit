@@ -21,39 +21,39 @@ import javax.validation.constraints.PositiveOrZero;
 public class RequestItemController {
     private final RequestItemClient requestItemClient;
 
+    @GetMapping
+    public ResponseEntity<Object> findAllByUserId(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        log.info("Gateway item request: get Item Requests By User ID {}.", userId);
+        return requestItemClient.findAllByUserId(userId);
+    }
+
     @GetMapping(value = "/all")
-    public ResponseEntity<Object> getAllItemRequests(
+    public ResponseEntity<Object> findAll(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(value = "from", defaultValue = "0")
             @PositiveOrZero Integer from,
             @RequestParam(value = "size", defaultValue = "10")
             @Positive Integer size) {
-        log.info("ItemRequestGatewayController: getAllItemRequests implementation. User ID {}.", userId);
-        return requestItemClient.getAll(userId, from, size);
-    }
-
-    @GetMapping
-    public ResponseEntity<Object> getItemRequestsByUser(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        log.info("ItemRequestGatewayController: getItemRequestsByUser implementation. User ID {}.", userId);
-        return requestItemClient.getItemRequestsByUser(userId);
+        log.info("Gateway item request: get All Item Requests User ID {}.", userId);
+        return requestItemClient.findAll(userId, from, size);
     }
 
     @GetMapping(value = "/{requestId}")
-    public ResponseEntity<Object> getItemRequest(
+    public ResponseEntity<Object> findById(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long requestId) {
-        log.info("ItemRequestGatewayController: getItemRequest implementation. User ID {}, request ID {}.",
+        log.info("Gateway item request: get Item Request User ID {}, request ID {}.",
                 userId, requestId);
-        return requestItemClient.getItemRequest(requestId, userId);
+        return requestItemClient.findById(requestId, userId);
     }
 
 
     @PostMapping
-    public ResponseEntity<Object> createItemRequest(
+    public ResponseEntity<Object> save(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @Validated(Create.class)
             @RequestBody RequestItemDto requestDto) {
-        log.info("ItemRequestGatewayController: createItemRequest implementation. User ID {}.", userId);
-        return requestItemClient.createItemRequest(userId, requestDto);
+        log.info("Gateway item request: create Item Request User ID {}.", userId);
+        return requestItemClient.save(userId, requestDto);
     }
 }

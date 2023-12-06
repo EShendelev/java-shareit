@@ -21,36 +21,36 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<Object> getUsers() {
-        log.info("UserGatewayController: getUsers implementation.");
+        log.info("Gateway user controller: get all Users");
         return userClient.getUsers();
     }
 
     @GetMapping(value = "/{userId}")
-    public ResponseEntity<Object> getUser(@PathVariable Long userId) {
-        log.info("UserGatewayController: getUser implementation. User ID {}.", userId);
-        return userClient.getUser(userId);
+    public ResponseEntity<Object> get(@PathVariable Long userId) {
+        log.info("Gateway user controller: get User ID {}.", userId);
+        return userClient.get(userId);
     }
 
     @PostMapping
-    public ResponseEntity<Object> createUser(
+    public ResponseEntity<Object> save(
             @Validated(Create.class)
             @RequestBody UserDtoRequest userDtoRequest) {
-        log.info("UserGatewayController: createUser implementation.");
-        return userClient.createUser(userDtoRequest);
+        log.info("Gateway user controller: create User");
+        return userClient.save(userDtoRequest);
     }
 
     @PatchMapping(value = "/{userId}")
-    public ResponseEntity<Object> updateUser(
+    public ResponseEntity<Object> update(
             @PathVariable Long userId,
             @Validated(Update.class)
             @RequestBody UserDtoRequest userDtoRequest) {
-        log.info("UserGatewayController: updateUser implementation. User ID {}.", userId);
-        return userClient.updateUser(userId, userDtoRequest);
+        log.info("Gateway user controller: update User ID {}.", userId);
+        return userClient.update(userId, userDtoRequest);
     }
 
     @DeleteMapping(value = "/{userId}")
-    public ResponseEntity<Object> deleteUser(@PathVariable Long userId) {
-        log.info("UserGatewayController: deleteUser implementation. User ID {}.", userId);
-        return userClient.deleteUser(userId);
+    public ResponseEntity<Object> delete(@PathVariable Long userId) {
+        log.info("Gateway user controller: delete User ID {}.", userId);
+        return userClient.delete(userId);
     }
 }

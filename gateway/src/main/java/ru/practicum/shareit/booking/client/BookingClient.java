@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.client;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +27,7 @@ public class BookingClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> getBookingsByStatus(Long userId, Status status, Integer from, Integer size) {
+    public ResponseEntity<Object> findAllByStatus(Long userId, Status status, Integer from, Integer size) {
         Map<String, Object> parameters = Map.of(
                 "state", status.name(),
                 "from", from,
@@ -36,7 +36,7 @@ public class BookingClient extends BaseClient {
         return get("?state={state}&from={from}&size={size}", userId, parameters);
     }
 
-    public ResponseEntity<Object> getBookingsByOwnerAndStatus(Long userId, Status state, Integer from, Integer size) {
+    public ResponseEntity<Object> findAllByOwnerAndStatus(Long userId, Status state, Integer from, Integer size) {
         Map<String, Object> parameters = Map.of(
                 "state", state.name(),
                 "from", from,
@@ -46,20 +46,20 @@ public class BookingClient extends BaseClient {
     }
 
 
-    public ResponseEntity<Object> bookItem(long userId, BookItemRequestDto requestDto) {
+    public ResponseEntity<Object> save(long userId, BookItemRequestDto requestDto) {
         return post("", userId, requestDto);
     }
 
-    public ResponseEntity<Object> getBooking(long userId, Long bookingId) {
+    public ResponseEntity<Object> findById(long userId, Long bookingId) {
         return get("/" + bookingId, userId);
     }
 
-    public ResponseEntity<Object> updateBookingStatus(Long userId, Long bookingId, Boolean approved) {
+    public ResponseEntity<Object> updateStatus(Long userId, Long bookingId, Boolean approved) {
         Map<String, Object> parameters = Map.of("approved", approved);
         return patch("/" + bookingId + "?approved={approved}", userId, parameters, null);
     }
 
-    public void deleteBooking(Long bookingId) {
+    public void delete(Long bookingId) {
         delete("/" + bookingId);
     }
 }

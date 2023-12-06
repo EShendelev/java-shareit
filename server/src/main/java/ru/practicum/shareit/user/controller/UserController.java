@@ -2,12 +2,9 @@ package ru.practicum.shareit.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.interfaces.UserService;
-import ru.practicum.shareit.validmark.Create;
-import ru.practicum.shareit.validmark.Update;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
@@ -33,30 +30,29 @@ public class UserController {
     @GetMapping("/{id}")
     public UserDto get(@PathVariable("id") long id) {
         UserDto user = userService.get(id);
-        log.info("Получен пользовать ID {}", id);
+        log.info("Server user controller: get User ID {}.", id);
         return user;
     }
 
     @PostMapping
-    public UserDto save(@Validated({Create.class}) @RequestBody UserDto userDto) {
+    public UserDto save(@RequestBody UserDto userDto) {
         UserDto user = userService.save(userDto);
-        log.info("Создан пользовать ID {}", user.getId());
+        log.info("Server user controller: create User");
         return user;
     }
 
     @PatchMapping("/{userId}")
     public UserDto update(@NotNull(message = "поле ID не может быть пустым")
                           @PathVariable Long userId,
-                          @Validated({Update.class})
                           @RequestBody UserDto userDto) {
         UserDto user = userService.update(userId, userDto);
-        log.info("Обновлена информация пользователя ID {}", userId);
+        log.info("Server user controller: update User ID {}.", userId);
         return user;
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable("id") long id) {
         userService.delete(id);
-        log.info("Удален пользователь ID {}", id);
+        log.info("Server user controller: delete User ID {}.", id);
     }
 }

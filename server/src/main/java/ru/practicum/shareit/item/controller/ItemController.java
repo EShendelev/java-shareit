@@ -2,21 +2,13 @@ package ru.practicum.shareit.item.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.service.interfaces.CommentService;
 import ru.practicum.shareit.item.service.interfaces.ItemService;
-import ru.practicum.shareit.validmark.Create;
-import ru.practicum.shareit.validmark.Update;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
 /**
@@ -33,43 +25,41 @@ public class ItemController {
     private static final String REQUEST_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public ItemResponseDto save(@Validated({Create.class})
-                                 @RequestBody ItemRequestDto itemRequestDto,
-                                 @RequestHeader(REQUEST_HEADER) Long ownerId) {
+    public ItemResponseDto save(
+            @RequestBody ItemRequestDto itemRequestDto,
+            @RequestHeader(REQUEST_HEADER) Long ownerId) {
         ItemResponseDto itemResponseDto = itemService.save(itemRequestDto, ownerId);
-        log.info("Создана запись о предмете ID {}", itemResponseDto.getId());
+        log.info("Server Item Controller: create Item. User ID {}.", ownerId);
         return itemResponseDto;
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto saveComment(@RequestHeader(REQUEST_HEADER) Long userId,
-                                  @PathVariable Long itemId,
-                                  @Valid @RequestBody CommentDto commentDto) {
+    public CommentDto saveComment(
+            @RequestHeader(REQUEST_HEADER) Long userId,
+            @PathVariable Long itemId,
+            @RequestBody CommentDto commentDto) {
         CommentDto comment = commentService.save(userId, itemId, commentDto);
-        log.info("Создан комментарий к предмету ID {} пользователем ID {}", itemId, userId);
+        log.info("Server Item Controller: create Comment. User ID {}, itemId {}.", userId, itemId);
         return comment;
     }
 
     @PatchMapping("/{itemId}")
-    public ItemResponseDto update(@Validated({Update.class})
-                                 @RequestBody ItemRequestDto itemRequestDto,
-                                 @PathVariable Long itemId,
-                                 @RequestHeader(REQUEST_HEADER) long ownerId) {
+    public ItemResponseDto update(
+            @RequestBody ItemRequestDto itemRequestDto,
+            @PathVariable Long itemId,
+            @RequestHeader(REQUEST_HEADER) long ownerId) {
         ItemResponseDto itemResponseDto = itemService.update(ownerId, itemId, itemRequestDto);
-        log.info("Обновлена информация по предмету ID {} владелец ID {}", itemId, ownerId);
+        log.info("Server Item Controller: update Item. User ID {}, itemId {}.", ownerId, itemId);
         return itemResponseDto;
     }
 
     @GetMapping
-    public Collection<ItemResponseDto> getAllUserItems(@Min(1)
-                                                       @NotNull
-                                                       @RequestHeader(REQUEST_HEADER) Long ownerId,
-                                                       @RequestParam(value = "from", defaultValue = "0")
-                                                       @PositiveOrZero int from,
-                                                       @RequestParam(value = "size", defaultValue = "10")
-                                                       @Positive int size) {
+    public Collection<ItemResponseDto> getAllUserItems(
+            @RequestHeader(REQUEST_HEADER) Long ownerId,
+            @RequestParam(value = "from", defaultValue = "0") int from,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         Collection<ItemResponseDto> itemsList = itemService.findAllByOwnerId(ownerId, from, size);
-        log.info("Получен список всех предметов");
+        log.info("Server Item Controller: get Items By Owner ID {}.", ownerId);
         return itemsList;
     }
 
@@ -77,18 +67,17 @@ public class ItemController {
     public ItemResponseDto findById(@PathVariable("id") Long itemId,
                                     @RequestHeader(REQUEST_HEADER) Long userId) {
         ItemResponseDto itemResponseDto = itemService.findById(userId, itemId);
-        log.info("Получена информация по предмету ID {}, пользователя ID {}", itemId, userId);
+        log.info("Server Item Controller: get Item. User ID {}, item ID {}.", userId, itemId);
         return itemResponseDto;
     }
 
     @GetMapping("/search")
-    public Collection<ItemResponseDto> searchByTextRequest(@RequestParam String text,
-                                                           @RequestParam(value = "from", defaultValue = "0")
-                                                           @PositiveOrZero int from,
-                                                           @RequestParam(value = "size", defaultValue = "10")
-                                                               @Positive int size) {
+    public Collection<ItemResponseDto> searchByTextRequest(
+            @RequestParam String text,
+            @RequestParam(value = "from", defaultValue = "0") int from,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         Collection<ItemResponseDto> itemsList = itemService.findItemByText(text, from, size);
-        log.info("Получен список предметов подходящих под запрос \"{}\"", text);
+        log.info("Server Item Controller: get Items By Text: {}.", text);
         return itemsList;
     }
 
@@ -96,7 +85,7 @@ public class ItemController {
     public void delete(@RequestHeader(REQUEST_HEADER) Long userId,
                        @PathVariable Long itemId) {
         itemService.delete(userId, itemId);
-        log.info("Удаление предмета ID {} пользователя ID {}", itemId, userId);
+        log.info("Server Item Controller: delete Item. User ID {}, itemId {}.", userId, itemId);
     }
 
 }

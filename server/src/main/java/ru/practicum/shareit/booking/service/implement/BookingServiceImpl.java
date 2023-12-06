@@ -112,7 +112,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public Collection<BookingResponseDto> getAllByOwnerIdAndState(Long userId, String stateText, int from, int size) {
+    public Collection<BookingResponseDto> getAllByOwnerIdAndStatus(Long userId, String stateText, int from, int size) {
         checkUser(userId);
 
         Pageable pageable = createPageRequest(from, size);

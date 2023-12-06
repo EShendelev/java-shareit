@@ -28,7 +28,7 @@ public class ItemClient extends BaseClient {
     }
 
 
-    public ResponseEntity<Object> getItemsByOwner(Long ownerId, Integer from, Integer size) {
+    public ResponseEntity<Object> getAllUserItems(Long ownerId, Integer from, Integer size) {
         Map<String, Object> parameters = Map.of(
                 "from", from,
                 "size", size
@@ -37,7 +37,7 @@ public class ItemClient extends BaseClient {
     }
 
 
-    public ResponseEntity<Object> getItemsByText(String text, Integer from, Integer size) {
+    public ResponseEntity<Object> searchByTextRequest(String text, Integer from, Integer size) {
         Map<String, Object> parameters = Map.of(
                 "text", text,
                 "from", from,
@@ -46,23 +46,23 @@ public class ItemClient extends BaseClient {
         return get("/search?text={text}&from={from}&size={size}", null, parameters);
     }
 
-    public ResponseEntity<Object> getItem(Long itemId, Long userId) {
+    public ResponseEntity<Object> findById(Long itemId, Long userId) {
         return get("/" + itemId, userId);
     }
 
-    public ResponseEntity<Object> createItem(Long userId, ItemDtoRequest dtoRequest) {
+    public ResponseEntity<Object> save(Long userId, ItemDtoRequest dtoRequest) {
         return post("", userId, dtoRequest);
     }
 
-    public ResponseEntity<Object> createComment(Long itemId, Long userId, CommentDto dtoRequest) {
+    public ResponseEntity<Object> saveComment(Long itemId, Long userId, CommentDto dtoRequest) {
         return post("/" + itemId + "/comment", userId, dtoRequest);
     }
 
-    public ResponseEntity<Object> updateItem(ItemDtoRequest dtoRequest, Long itemId, Long userId) {
+    public ResponseEntity<Object> update(ItemDtoRequest dtoRequest, Long itemId, Long userId) {
         return patch("/" + itemId, userId, dtoRequest);
     }
 
-    public ResponseEntity<Object> deleteItem(Long itemId, Long userId) {
+    public ResponseEntity<Object> delete(Long itemId, Long userId) {
         return delete("/" + itemId, userId);
     }
 }
