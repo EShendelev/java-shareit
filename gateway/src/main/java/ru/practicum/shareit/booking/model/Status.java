@@ -29,7 +29,7 @@ public enum Status {
 
     public static Status checkValidStatus(String stateParam) {
         try {
-            Status.valueOf(stateParam);
+            Status.valueOf(stateParam.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new StatusNotExistException("Unknown state: " + stateParam);
         }

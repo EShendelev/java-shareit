@@ -25,11 +25,11 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<Object> findAllByStatus(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(name = "state", defaultValue = "all") String stateParam,
+            @RequestParam(name = "state", defaultValue = "ALL") String stateParam,
             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
             @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         Status status = Status.checkValidStatus(stateParam);
-        Status.checkValidStatus(stateParam);
+         Status.checkValidStatus(stateParam);
         log.info("Gateway Booking Controller: Get booking with state {}, userId={}, from={}, size={}",
                 stateParam, userId, from, size);
         return bookingClient.findAllByStatus(userId, status, from, size);
@@ -38,7 +38,7 @@ public class BookingController {
     @GetMapping(value = "/owner")
     public ResponseEntity<Object> findAllByOwnerIdAndStatus(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(name = "state", defaultValue = "all") String stateParam,
+            @RequestParam(name = "state", defaultValue = "ALL") String stateParam,
             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
             @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         Status status = Status.checkValidStatus(stateParam);
@@ -58,7 +58,7 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<Object> save(
             @RequestHeader("X-Sharer-User-Id") long userId,
-            @RequestBody @Validated(Create.class) BookItemRequestDto requestDto) {
+            @Validated(Create.class) @RequestBody BookItemRequestDto requestDto) {
         log.info("Gateway Booking Controller: Creating booking {}, userId={}", requestDto, userId);
         return bookingClient.save(userId, requestDto);
     }

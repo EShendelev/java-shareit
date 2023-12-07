@@ -8,6 +8,8 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.StatusNotExistException;
 import ru.practicum.shareit.exception.ValidateException;
 
+import javax.validation.ConstraintViolationException;
+
 @RestControllerAdvice
 public class ErrorHandler {
 
@@ -19,7 +21,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public  ErrorResponse handle(ValidateException e) {
+    public ErrorResponse handle(ValidateException e) {
         return new ErrorResponse(e.getMessage());
     }
 
@@ -28,4 +30,11 @@ public class ErrorHandler {
     public ErrorResponse handle(StatusNotExistException e) {
         return new ErrorResponse(e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handle(ConstraintViolationException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
 }
