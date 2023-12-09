@@ -6,7 +6,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
-import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.service.interfaces.BookingService;
 import ru.practicum.shareit.exception.ValidateException;
 
