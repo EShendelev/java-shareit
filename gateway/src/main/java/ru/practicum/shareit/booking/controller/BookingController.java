@@ -29,7 +29,6 @@ public class BookingController {
             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
             @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         Status status = Status.checkValidStatus(stateParam);
-         Status.checkValidStatus(stateParam);
         log.info("Gateway Booking Controller: Get booking with state {}, userId={}, from={}, size={}",
                 stateParam, userId, from, size);
         return bookingClient.findAllByStatus(userId, status, from, size);

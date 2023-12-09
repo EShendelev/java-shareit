@@ -30,7 +30,6 @@ public class BookingController {
             @RequestParam(name = "state", defaultValue = "ALL") String stateText,
             @RequestParam(value = "from", defaultValue = "0") int from,
             @RequestParam(value = "size", defaultValue = "10") int size) {
-        Status.checkValidStatus(stateText);
         log.info("Server Booking Controller: Get booking with state {}, userId={}, from={}, size={}",
                 stateText, userId, from, size);
         return bookingService.getAllByState(userId, stateText, from, size);
@@ -42,7 +41,6 @@ public class BookingController {
             @RequestParam(name = "state", defaultValue = "ALL") String stateText,
             @RequestParam(value = "from", defaultValue = "0") int from,
             @RequestParam(value = "size", defaultValue = "10") int size) {
-        Status.checkValidStatus(stateText);
         log.info("Server Booking Controller: Get booking with state {}, userId={}, from={}, size={}",
                 stateText, userId, from, size);
         return bookingService.getAllByOwnerIdAndStatus(userId, stateText, from, size);
