@@ -33,6 +33,6 @@ services:
     ports:
       - "6541:5432"
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
+      - POSTGRES_DB=shareit
+      - POSTGRES_USER=shareit
       - POSTGRES_PASSWORD=password
